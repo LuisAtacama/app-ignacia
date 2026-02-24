@@ -4,59 +4,48 @@ import random
 # 1. CONFIGURACIÓN
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO CSS (BLANCO TOTAL Y PULCRO) ---
+# --- DISEÑO CSS ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
     .stApp { background-color: #FFFFFF; }
-    .main .block-container {
-        background-color: #FFFFFF;
-        padding: 40px !important;
-        font-family: 'Inter', sans-serif;
-        max-width: 600px;
-    }
-    h1, h2, h3, p, label { color: #1A1A1A !important; text-align: center; }
+    .main .block-container { background-color: #FFFFFF; padding: 40px !important; max-width: 600px; }
+    h1, h3, p { color: #1A1A1A !important; text-align: center; font-family: 'Inter', sans-serif; }
     .stInfo { 
-        background-color: #F8F9FA !important; 
-        border-radius: 20px; border: 1px solid #EEE;
-        color: #1A1A1A !important; padding: 25px !important;
-        font-size: 18px; line-height: 1.6;
+        background-color: #F8F9FA !important; border-radius: 20px; border: 1px solid #EEE;
+        color: #1A1A1A !important; padding: 25px !important; font-size: 18px;
     }
-    .whatsapp-container { text-align: center; margin-top: 40px; }
     .whatsapp-btn {
         background-color: #25D366; color: white !important; padding: 14px 28px;
-        border-radius: 50px; text-decoration: none !important; font-weight: 700;
-        display: inline-flex; align-items: center; gap: 10px;
+        border-radius: 50px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 10px;
     }
-    .stTextInput > div > div > input { border-radius: 25px; border: 1px solid #DDD; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. EL CEREBRO DE PAPI (ESTILO LUIS: VIVALDI Y PREGUNTÓN) ---
-def obtener_respuesta_papa(texto):
+# --- 2. EL MOTOR DE RESPUESTA DINÁMICO (ESTILO LUIS) ---
+def responder_como_papi_vivaldi(texto):
     texto = texto.lower()
-    cierre_abrazo = " Le mando un abrazo apretado."
     
-    # Respuesta para PENA o PROBLEMAS (Estilo directo y preguntón)
-    if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "asusto", "pucha"]):
-        return (f"¿Pero hijita está bien?, ¿le pasó algo? Pucha más Vivaldi po mi niñita. "
-                f"Cuénteme qué pasó para que lo arreglemos.{cierre_abrazo}")
+    # Piezas de su lenguaje real
+    preocupacion = ["¿Pero hijita está bien?", "¿Qué pasó mi chiquitita?", "¿Le pasó algo malo?", "Pucha mi niñita, cuénteme bien."]
+    reaccion_vivaldi = ["Hay que estar Vivaldi po.", "Pucha más Vivaldi po mi niñita.", "Ya po, estemos Vivaldi con eso.", "Hay que estar atenta e inteligente."]
+    apoyo = ["No hay nada que cambiar en usted.", "Usted es increíble tal como es.", "Acuérdese que es súper capaz.", "Lo vamos a arreglar juntos."]
+    
+    # Lógica de construcción
+    if any(k in texto for k in ["triste", "pena", "mal", "miedo", "pucha"]):
+        msg = f"{random.choice(preocupacion)} {random.choice(reaccion_vivaldi)} {random.choice(apoyo)} Le mando un abrazo apretado."
+    
+    elif any(k in texto for k in ["colegio", "tarea", "nota", "prueba"]):
+        msg = f"¿Y cómo le fue? {random.choice(reaccion_vivaldi)} No se abrume, vamos por partes. Le mando un abrazo apretado."
         
-    # Temas de COLEGIO o AMIGAS
-    if any(k in texto for k in ["colegio", "tarea", "prueba", "nota", "amiga", "pelea"]):
-        return (f"Ya po hijita, cuénteme bien qué pasó. Hay que estar Vivaldi con las cosas del colegio. "
-                f"No se abrume y respire profundo. {cierre_abrazo}")
-
-    # LOGROS (Celebración corta)
-    if any(k in texto for k in ["gane", "bien", "logre", "mira", "foto", "dibujo"]):
-        return "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó de Vivaldi!"
-
-    # EXTRAÑAR
-    if any(k in texto for k in ["extraño", "papi", "verte", "donde", "te quiero"]):
-        return f"Yo también la extraño mucho, mi chiquitita linda. Mi corazón está al ladito suyo siempre.{cierre_abrazo}"
-
-    # DEFAULT (Si no entiende, pregunta)
-    return "¿Pero qué pasó hijita? Cuénteme más para entenderla bien. La amo mucho siempre."
+    elif any(k in texto for k in ["gane", "bien", "logre", "mira", "foto"]):
+        msg = "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó de Vivaldi!"
+    
+    else:
+        # Respuesta por defecto si no detecta tema
+        msg = f"¿Pero qué pasó hijita? Cuénteme más para entenderla. {random.choice(reaccion_vivaldi)} La amo mucho siempre."
+    
+    return msg
 
 # --- 3. BANCO DE FOTOS ---
 fotos_galeria = [
@@ -90,30 +79,19 @@ fotos_galeria = [
 # --- 4. INTERFAZ ---
 st.title("❤️ App de Ignacia")
 
-# CHAT
 st.write("### 💬 Pregúntele a Papi")
-pregunta = st.text_input("Escríbame algo, mi niñita...", key="chat_input")
+pregunta = st.text_input("Cuénteme algo, mi niñita...", key="chat_input")
 if pregunta:
-    st.info(f"👨‍👧 **Papi dice:** {obtener_respuesta_papa(pregunta)}")
+    st.info(f"👨‍👧 **Papi dice:** {responder_como_papi_vivaldi(pregunta)}")
 
 st.divider()
 
-# ÁNIMO
-st.write("### 😊 ¿Cómo se siente usted hoy?")
+st.write("### 😊 ¿Cómo se siente hoy?")
 animo = st.select_slider(label="Estado:", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
 
 if animo != "Seleccione":
-    foto_rnd = random.choice(fotos_galeria)
-    st.image(foto_rnd, use_container_width=True)
-    st.markdown("<p style='text-align:center; font-style:italic; font-size:18px;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
-    if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
+    foto = random.choice(fotos_galeria)
+    st.image(foto, use_container_width=True)
+    st.markdown("<p style='font-style:italic;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
 
-# BOTÓN WHATSAPP
-st.markdown(f"""
-    <div class="whatsapp-container">
-        <a href="https://wa.me/56992238085" class="whatsapp-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="24">
-            MENSAJE A PAPI
-        </a>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown("""<div style='text-align:center; margin-top:40px;'><a href='https://wa.me/56992238085' class='whatsapp-btn'><img src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' width='24'> MENSAJE A PAPI</a></div>""", unsafe_allow_html=True)
