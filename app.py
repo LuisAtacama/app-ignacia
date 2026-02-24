@@ -76,7 +76,7 @@ else:
         st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg")
 
     elif animo == "Normal":
-        st.write("### ¡Disfrute su día! Aquí va una humorada para usted:")
+        st.write("### ¡Disfrute su día! Aquí otro quizás no tan fome:")
         st.info(chiste_del_momento)
         st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg")
 
