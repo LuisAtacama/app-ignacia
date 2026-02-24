@@ -4,54 +4,77 @@ import random
 # 1. Configuración de la página
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
 
-# --- DISEÑO SOFISTICADO CON FONDO PERSONALIZADO ---
-# Usaremos una de sus fotos de fondo con un filtro para que no moleste la lectura
+# --- DISEÑO MODERNO (CSS) ---
 foto_fondo = "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"
 
 st.markdown(f"""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
     .stApp {{
         background-image: url("{foto_fondo}");
         background-attachment: fixed;
         background-size: cover;
     }}
-    /* Capa de legibilidad: un fondo oscuro semitransparente sobre el fondo */
+    
+    /* Capa oscura para legibilidad */
     .main {{
-        background-color: rgba(255, 255, 255, 0.85); /* Blanco traslúcido para que se lea todo */
-        padding: 20px;
+        background-color: rgba(0, 0, 0, 0.7); 
+        padding: 25px;
         border-radius: 20px;
-        margin: 10px;
+        color: white !important;
+        font-family: 'Inter', sans-serif;
     }}
-    /* Títulos con estilo */
-    h1 {{
-        color: #d63384;
-        font-family: 'Georgia', serif;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.6);
-        border-radius: 10px;
+
+    /* Forzar que todos los textos sean blancos */
+    h1, h2, h3, p, span, label, .stMarkdown {{
+        color: white !important;
+        font-family: 'Inter', sans-serif !important;
     }}
-    /* Estilo para los mensajes de chistes */
-    .stInfo {{
+
+    /* Estilo para los botones de estado de ánimo */
+    div.stButton > button {{
+        width: 100%;
         border-radius: 15px;
-        border-left: 5px solid #d63384;
+        height: 80px;
+        font-size: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
     }}
-    /* Botón de WhatsApp */
+    
+    div.stButton > button:hover {{
+        background-color: #d63384;
+        border-color: #d63384;
+        transform: scale(1.02);
+    }}
+
+    /* Caja de chistes */
+    .stInfo {{
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+    }}
+
+    /* Botón WhatsApp */
     .whatsapp-btn {{
         background-color: #25D366;
-        color: white;
-        padding: 15px 25px;
+        color: white !important;
+        padding: 15px 30px;
         border-radius: 50px;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         font-weight: bold;
         gap: 10px;
+        margin-top: 20px;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. EL BANCO DE DATOS (FOTOS Y CHISTES) ---
-
+# --- 2. BANCO DE DATOS ---
 fotos_galeria = [
     "https://i.postimg.cc/26433cj7/IMG-5004.jpg", "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg",
     "https://i.postimg.cc/SsWjjTQz/IMG-5038.jpg", "https://i.postimg.cc/858jpQG5/IMG-5046.jpg", "https://i.postimg.cc/dV17njnY/IMG-5047.jpg",
@@ -74,8 +97,6 @@ fotos_galeria = [
     "https://i.postimg.cc/QMCp9rvq/IMG-5480.jpg", "https://i.postimg.cc/R0hc6z2G/IMG-5486.jpg", "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"
 ]
 
-palabras = ["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", "De La Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"]
-
 lista_chistes = [
     "— En Hawai uno no se hospeda, se aloha.", "— ¿Cómo se llama el campeón japonés de buceo? Tokofondo. ¿Y el segundo? Kasitoko.",
     "— Ayer pasé por su casa y me tiró una palta… qué palta de respeto.", "— Robinson Crusoe y lo atropellaron.",
@@ -92,67 +113,59 @@ lista_chistes = [
     "— Robinson Crusoe… quedó solo.", "— ¿Cuántos pelos tiene la cola de un caballo? 30.583. ¿Y cómo lo sabe? Esa es otra pregunta."
 ]
 
-# --- 3. LÓGICA DE MEMORIA (Para chistes y ahora también FOTOS) ---
-if 'chistes_vistos' not in st.session_state or len(st.session_state.chistes_vistos) == len(lista_chistes):
-    st.session_state.chistes_vistos = []
-if 'fotos_vistas' not in st.session_state or len(st.session_state.fotos_vistas) == len(fotos_galeria):
-    st.session_state.fotos_vistas = []
-
-chistes_disp = [c for c in lista_chistes if c not in st.session_state.chistes_vistos]
-fotos_disp = [f for f in fotos_galeria if f not in st.session_state.fotos_vistas]
-
-chiste_actual = random.choice(chistes_disp)
-foto_actual = random.choice(fotos_disp)
-
+# --- 3. LÓGICA ---
 if 'saludo' not in st.session_state:
-    st.session_state.saludo = random.choice(palabras)
+    st.session_state.saludo = random.choice(["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", "De La Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"])
 
-# --- 4. CUERPO DE LA APP ---
+# --- 4. INTERFAZ ---
 st.title(f"❤️ ¡Hola, mi Señora {st.session_state.saludo}!")
-st.markdown("<p style='text-align: center;'><b>Dedicado con todo mi amor para usted.</b></p>", unsafe_allow_html=True)
+st.write("### ¿Cómo se siente usted hoy?")
 
-st.subheader("💬 ¿Cómo se siente usted hoy?")
-animo = st.select_slider("Deslice la barrita:", options=["Seleccione", "Triste", "Normal", "Feliz", "¡Súper Feliz!"])
+col1, col2 = st.columns(2)
+col3, col4 = st.columns(2)
+
+opcion = None
+
+with col1:
+    if st.button("😔 Triste"):
+        opcion = "Triste"
+with col2:
+    if st.button("😐 Normal"):
+        opcion = "Normal"
+with col3:
+    if st.button("😊 Feliz"):
+        opcion = "Feliz"
+with col4:
+    if st.button("🚀 ¡Súper!"):
+        opcion = "Súper Feliz"
 
 st.write("---")
 
-if animo == "Seleccione":
-    st.info("✨ Mueva la barrita de arriba para recibir su mensaje, mi niñita.")
-else:
-    # Registrar lo visto
-    st.session_state.chistes_vistos.append(chiste_actual)
-    st.session_state.fotos_vistas.append(foto_actual)
+if opcion:
+    chiste = random.choice(lista_chistes)
+    foto = random.choice(fotos_galeria)
 
-    if animo == "Triste":
-        st.write("### Mi niñita, un chiste fome para alegrar el día. Mire:")
-        st.info(chiste_actual)
-        st.image(foto_actual, use_container_width=True)
-
-    elif animo == "Normal":
+    if opcion == "Triste":
+        st.write("### Mi niñita, un chiste fome para alegrar el día:")
+        st.info(chiste)
+        st.image(foto, use_container_width=True)
+    elif opcion == "Normal":
         st.write("### ¡Disfrute su día! Aquí uno quizás no tan fome:")
-        st.info(chiste_actual)
-        st.image(foto_actual, use_container_width=True)
-
-    elif animo == "Feliz":
-        st.write("### ¡Esa es mi hija! Mire este video:")
-        st.video("https://youtu.be/sB-TdQKWMGI")
+        st.info(chiste)
+        st.image(foto, use_container_width=True)
+    elif opcion == "Feliz" or opcion == "Súper Feliz":
+        st.write(f"### ¡Esa es mi hija! {'¡CELEBRACIÓN TOTAL!' if opcion == 'Súper Feliz' else ''}")
         st.balloons()
-        st.image(foto_actual, caption="¡Usted es pura luz!", use_container_width=True)
+        if opcion == "Súper Feliz": st.snow()
+        st.info(chiste)
+        st.image(foto, use_container_width=True)
 
-    elif animo == "¡Súper Feliz!":
-        st.write("### ¡CELEBRACIÓN TOTAL PARA USTED! 🎉")
-        st.video("https://youtu.be/sB-TdQKWMGI")
-        st.balloons()
-        st.snow()
-        st.image(foto_actual, use_container_width=True)
-
-    st.write("---")
-    # Botón WhatsApp Estilizado
-    st.markdown("""
-        <div style="text-align: center;">
-            <a href="https://wa.me/56992238085" class="whatsapp-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20">
-                ENVIARLE UN MENSAJE A PAPÁ
-            </a>
-        </div>
-    """, unsafe_allow_html=True)
+st.write("---")
+st.markdown(f"""
+    <div style="text-align: center;">
+        <a href="https://wa.me/56992238085" class="whatsapp-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20">
+            ENVIARLE UN MENSAJE A PAPÁ
+        </a>
+    </div>
+""", unsafe_allow_html=True)
