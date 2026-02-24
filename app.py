@@ -4,89 +4,121 @@ import random
 # 1. Configuración de la página
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO: FONDO MOSAICO Y ESPACIADO BLANCO ---
-nuevo_fondo = "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
-
+# --- DISEÑO: FONDO BLANCO PLANO Y TIPOGRAFÍA MODERNA ---
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
+    /* Fondo blanco plano en toda la app */
     .stApp {{
-        background-image: url("{nuevo_fondo}");
-        background-attachment: fixed;
-        background-size: cover;
+        background-color: #FFFFFF;
     }}
     
-    /* El contenedor blanco con mucho "aire" */
+    /* Contenedor central limpio */
     .main .block-container {{
-        background-color: rgba(255, 255, 255, 0.98); 
-        padding: 50px !important;
-        border-radius: 40px;
-        margin-top: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-        max-width: 550px;
+        background-color: #FFFFFF;
+        padding: 40px !important;
+        font-family: 'Inter', sans-serif;
+        max-width: 600px;
     }}
 
-    h1, h3, p {{
-        color: #333333 !important;
+    /* Textos en gris oscuro/negro para contraste sobre blanco */
+    h1, h3, p, label, .stMarkdown {{
+        color: #1A1A1A !important;
         font-family: 'Inter', sans-serif !important;
         text-align: center;
     }}
 
-    /* Botones Redondos y Separados */
-    div.stButton > button {{
-        width: 75px !important;
-        height: 75px !important;
-        border-radius: 50% !important;
-        background-color: #FFFFFF !important;
-        border: 1px solid #EEEEEE;
-        display: block;
-        margin: 0 auto !important;
-        background-size: 70% !important;
-        background-repeat: no-repeat !important;
-        background-position: center !important;
-        color: transparent !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        transition: transform 0.2s ease;
+    h1 {{
+        font-weight: 700;
+        margin-bottom: 30px;
     }}
 
-    div.stButton > button:hover {{
-        transform: scale(1.1);
-        border-color: #25D366;
+    /* Estilo para la barra (Slider) */
+    .stSlider {{
+        padding-top: 20px;
+        padding-bottom: 40px;
     }}
 
-    /* Asignación de iconos de caritas */
-    div.stButton:nth-of-type(1) > button {{ background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160738.png") !important; }}
-    div.stButton:nth-of-type(2) > button {{ background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160713.png") !important; }}
-    div.stButton:nth-of-type(3) > button {{ background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160753.png") !important; }}
-    div.stButton:nth-of-type(4) > button {{ background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160721.png") !important; }}
+    /* Caja de chistes minimalista */
+    .stInfo {{
+        background-color: #F8F9FA !important;
+        color: #333333 !important;
+        border: 1px solid #EEEEEE !important;
+        border-radius: 15px;
+        padding: 20px !important;
+    }}
 
-    /* Botón WhatsApp: Logo + Texto */
+    /* Botón WhatsApp: Logo + Texto (Sin subrayado) */
     .whatsapp-container {{
         text-align: center;
-        margin-top: 30px;
+        margin-top: 40px;
     }}
 
     .whatsapp-btn {{
         background-color: #25D366;
         color: white !important;
-        padding: 14px 28px;
-        border-radius: 15px;
+        padding: 16px 32px;
+        border-radius: 50px;
         text-decoration: none !important;
         font-weight: 700;
         display: inline-flex;
         align-items: center;
         gap: 12px;
         font-size: 16px;
-        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        transition: transform 0.2s ease;
+    }}
+    
+    .whatsapp-btn:hover {{
+        transform: scale(1.05);
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. BANCO DE DATOS ---
-fotos_galeria = ["https://i.postimg.cc/26433cj7/IMG-5004.jpg", "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg", "https://i.postimg.cc/SsWjjTQz/IMG-5038.jpg", "https://i.postimg.cc/858jpQG5/IMG-5046.jpg", "https://i.postimg.cc/dV17njnY/IMG-5047.jpg", "https://i.postimg.cc/zXpbncw5/IMG-5065.jpg", "https://i.postimg.cc/02ZMpBGq/IMG-5072.jpg", "https://i.postimg.cc/TYQLr4Vz/IMG-5075.jpg", "https://i.postimg.cc/dtnk8x2n/IMG-5078.jpg", "https://i.postimg.cc/YqtLLHWF/IMG-5084.jpg", "https://i.postimg.cc/xT9NN2zJ/IMG-5093.jpg", "https://i.postimg.cc/Dy744TXW/IMG-5094.jpg", "https://i.postimg.cc/HsT88gyy/IMG-5095.jpg", "https://i.postimg.cc/FzVfCP2H/IMG-5096.jpg", "https://i.postimg.cc/br9GV6Kh/IMG-5097.jpg", "https://i.postimg.cc/rsNdZhvq/IMG-5098.jpg", "https://i.postimg.cc/7hnCtBpw/IMG-5099.jpg", "https://i.postimg.cc/Vv8rRyZH/IMG-5107.jpg", "https://i.postimg.cc/63R4n6cY/IMG-5111.jpg", "https://i.postimg.cc/rmWRxyjg/IMG-5114.jpg", "https://i.postimg.cc/ZR3vpYHL/IMG-5115.jpg", "https://i.postimg.cc/cHYtw1hm/IMG-5117.jpg", "https://i.postimg.cc/0QmKD5nM/IMG-5119.jpg", "https://i.postimg.cc/B6DPHZpj/IMG-5123.jpg", "https://i.postimg.cc/s2bZMGYS/IMG-5137.jpg", "https://i.postimg.cc/DzRbS4rL/IMG-5163.jpg", "https://i.postimg.cc/MGgjnf7S/IMG-5186.jpg", "https://i.postimg.cc/0NhJzKpT/IMG-5189.jpg", "https://i.postimg.cc/6Q8v6fvK/IMG-5200.jpg", "https://i.postimg.cc/Gp4y3xyn/IMG-5204.jpg", "https://i.postimg.cc/bwCnjBdT/IMG-5214.jpg", "https://i.postimg.cc/FHWSQB1f/IMG-5215.jpg", "https://i.postimg.cc/251Zj7Zp/IMG-5239.jpg", "https://i.postimg.cc/fbV9Wf07/IMG-5241.jpg", "https://i.postimg.cc/g2ShPTr6/IMG-5254.jpg", "https://i.postimg.cc/wjTNZpqZ/IMG-5256.jpg", "https://i.postimg.cc/W1bZCvNQ/IMG-5282.jpg", "https://i.postimg.cc/FHsS84rq/IMG-5285.jpg", "https://i.postimg.cc/HksMRgYP/IMG-5290.jpg", "https://i.postimg.cc/qMGn1RTG/IMG-5291.jpg", "https://i.postimg.cc/hPnT8mHf/IMG-5295.jpg", "https://i.postimg.cc/fTsm7d6M/IMG-5315.jpg", "https://i.postimg.cc/fWmY0CgL/IMG-5316.jpg", "https://i.postimg.cc/8kMLr4nk/IMG-5317.jpg", "https://i.postimg.cc/gjVRFc6R/IMG-5324.jpg", "https://i.postimg.cc/sxdSNG1y/IMG-5365.jpg", "https://i.postimg.cc/L5Kfbg5T/IMG-5367.jpg", "https://i.postimg.cc/fynXrSyC/IMG-5371.jpg", "https://i.postimg.cc/0jRmBKjp/IMG-5378.jpg", "https://i.postimg.cc/W4y00Hvd/IMG-5384.jpg", "https://i.postimg.cc/XvqwG0tm/IMG-5395.jpg", "https://i.postimg.cc/VNvjrc27/IMG-5449.jpg", "https://i.postimg.cc/BvbxLGRV/IMG-5473.jpg", "https://i.postimg.cc/QMCp9rvq/IMG-5480.jpg", "https://i.postimg.cc/R0hc6z2G/IMG-5486.jpg", "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"]
-lista_chistes = ["— En Hawai uno no se hospeda, se aloha.", "— ¿Cómo se llama el campeón japonés de buceo? Tokofondo. ¿Y el segundo? Kasitoko.", "— Ayer pasé por su casa y me tiró una palta… qué palta de respeto.", "— Robinson Crusoe y lo atropellaron.", "— El otro día vi a un otaku triste y lo animé.", "— Ayer metí un libro de récords en la batidora y batí todos los récords.", "— ¿Qué le dice un pan a otro pan? Le presento una miga.", "— Cuando esté triste abraza un zapato. Un zapato consuela.", "— Doctor, doctor, tengo un hueso afuera. ¡Hágalo pasar!", "— Una señora llorando llega a una zapatería: ¿Tiene zapatos de cocodrilo? ¿Qué número calza su cocodrilo?", "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo: Game Over.", "— Un tipo va al oculista. —Mire la pared. —¿Cuál pared?", "— ¿Cómo se llama su padre? —Igual. —¿Don Igual? —Sí.", "— Un español le pregunta a un inglés: Firemen. —Nosotros por teléfono.", "— ¿Se sabe el chiste del tarro? —No. —¡Qué lata!", "— Había un niñito que se llamaba Tarea. Tarea para la casa. Y Tarea se fue.", "— Tengo un perro que dice “Hola”. —En mi casa tengo un tarro que dice “Nescafé”.", "— ¿Qué le dijo un poste de luz a otro? El último apaga la luz.", "— ¿Aló, está Joaco? —No, Joaco Imprar.", "— Señorita, ¿hayalletas? (Hay galletas)", "— ¿Cómo estornuda un tomate? ¡Ketchup!", "— ¿Qué le dijo un árbol a otro? Nos dejaron plantados.", "— ¿Qué le dijo un techo a otro? Techo de menos.", "— ¿Qué hace una abeja en el gimnasio? Zum-ba.", "— Robinson Crusoe… quedó solo.", "— ¿Cuántos pelos tiene la cola de un caballo? 30.583. ¿Y cómo lo sabe? Esa es otra pregunta."]
+# --- 2. BANCO DE DATOS ACTUALIZADO ---
+fotos_galeria = [
+    "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg",
+    "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg",
+    "https://i.postimg.cc/SsWjjTQz/IMG-5038.jpg", "https://i.postimg.cc/858jpQG5/IMG-5046.jpg",
+    "https://i.postimg.cc/dV17njnY/IMG-5047.jpg", "https://i.postimg.cc/zXpbncw5/IMG-5065.jpg",
+    "https://i.postimg.cc/02ZMpBGq/IMG-5072.jpg", "https://i.postimg.cc/TYQLr4Vz/IMG-5075.jpg",
+    "https://i.postimg.cc/dtnk8x2n/IMG-5078.jpg", "https://i.postimg.cc/YqtLLHWF/IMG-5084.jpg",
+    "https://i.postimg.cc/xT9NN2zJ/IMG-5093.jpg", "https://i.postimg.cc/Dy744TXW/IMG-5094.jpg",
+    "https://i.postimg.cc/HsT88gyy/IMG-5095.jpg", "https://i.postimg.cc/FzVfCP2H/IMG-5096.jpg",
+    "https://i.postimg.cc/br9GV6Kh/IMG-5097.jpg", "https://i.postimg.cc/rsNdZhvq/IMG-5098.jpg",
+    "https://i.postimg.cc/Vv8rRyZH/IMG-5107.jpg", "https://i.postimg.cc/63R4n6cY/IMG-5111.jpg",
+    "https://i.postimg.cc/ZR3vpYHL/IMG-5115.jpg", "https://i.postimg.cc/cHYtw1hm/IMG-5117.jpg",
+    "https://i.postimg.cc/B6DPHZpj/IMG-5123.jpg", "https://i.postimg.cc/DzRbS4rL/IMG-5163.jpg",
+    "https://i.postimg.cc/MGgjnf7S/IMG-5186.jpg", "https://i.postimg.cc/0NhJzKpT/IMG-5189.jpg",
+    "https://i.postimg.cc/Gp4y3xyn/IMG-5204.jpg", "https://i.postimg.cc/bwCnjBdT/IMG-5214.jpg",
+    "https://i.postimg.cc/FHWSQB1f/IMG-5215.jpg", "https://i.postimg.cc/251Zj7Zp/IMG-5239.jpg",
+    "https://i.postimg.cc/fbV9Wf07/IMG-5241.jpg", "https://i.postimg.cc/wjTNZpqZ/IMG-5256.jpg",
+    "https://i.postimg.cc/W1bZCvNQ/IMG-5282.jpg", "https://i.postimg.cc/FHsS84rq/IMG-5285.jpg",
+    "https://i.postimg.cc/HksMRgYP/IMG-5290.jpg", "https://i.postimg.cc/qMGn1RTG/IMG-5291.jpg",
+    "https://i.postimg.cc/hPnT8mHf/IMG-5295.jpg", "https://i.postimg.cc/gjVRFc6R/IMG-5324.jpg",
+    "https://i.postimg.cc/sxdSNG1y/IMG-5365.jpg", "https://i.postimg.cc/L5Kfbg5T/IMG-5367.jpg",
+    "https://i.postimg.cc/fynXrSyC/IMG-5371.jpg", "https://i.postimg.cc/0jRmBKjp/IMG-5378.jpg",
+    "https://i.postimg.cc/W4y00Hvd/IMG-5384.jpg", "https://i.postimg.cc/XvqwG0tm/IMG-5395.jpg",
+    "https://i.postimg.cc/VNvjrc27/IMG-5449.jpg", "https://i.postimg.cc/BvbxLGRV/IMG-5473.jpg",
+    "https://i.postimg.cc/QMCp9rvq/IMG-5480.jpg", "https://i.postimg.cc/R0hc6z2G/IMG-5486.jpg",
+    "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
+]
+
+lista_chistes = [
+    "— En Hawai uno no se hospeda, se aloha.", "— ¿Cómo se llama el campeón japonés de buceo? Tokofondo. ¿Y el segundo? Kasitoko.",
+    "— Ayer pasé por su casa y me tiró una palta… qué palta de respeto.", "— Robinson Crusoe y lo atropellaron.",
+    "— El otro día vi a un otaku triste y lo animé.", "— Ayer metí un libro de récords en la batidora y batí todos los récords.",
+    "— ¿Qué le dice un pan a otro pan? Le presento una miga.", "— Cuando esté triste abraza un zapato. Un zapato consuela.",
+    "— Doctor, doctor, tengo un hueso afuera. ¡Hágalo pasar!", "— Una señora llorando llega a una zapatería: ¿Tiene zapatos de cocodrilo? ¿Qué número calza su cocodrilo?",
+    "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo: Game Over.", "— Un tipo va al oculista. —Mire la pared. —¿Cuál pared?",
+    "— ¿Cómo se llama su padre? —Igual. —¿Don Igual? —Sí.", "— Un español le pregunta a un inglés: Firemen. —Nosotros por teléfono.",
+    "— ¿Se sabe el chiste del tarro? —No. —¡Qué lata!", "— Había un niñito que se llamaba Tarea. Tarea para la casa. Y Tarea se fue.",
+    "— Tengo un perro que dice “Hola”. —En mi casa tengo un tarro que dice “Nescafé”.", "— ¿Qué le dijo un poste de luz a otro? El último apaga la luz.",
+    "— ¿Aló, está Joaco? —No, Joaco Imprar.", "— Señorita, ¿hayalletas? (Hay galletas)",
+    "— ¿Cómo estornuda un tomate? ¡Ketchup!", "— ¿Qué le dijo un árbol a otro? Nos dejaron plantados.",
+    "— ¿Qué le dijo un techo a otro? Techo de menos.", "— ¿Qué hace una abeja en el gimnasio? Zum-ba.",
+    "— Robinson Crusoe… quedó solo.", "— ¿Cuántos pelos tiene la cola de un caballo? 30.583. ¿Y cómo lo sabe? Esa es otra pregunta."
+]
 
 # --- 3. LÓGICA ---
 if 'saludo' not in st.session_state:
@@ -96,30 +128,26 @@ if 'saludo' not in st.session_state:
 st.title(f"❤️ ¡Hola, mi Señora {st.session_state.saludo}!")
 st.write("### ¿Cómo se siente usted hoy?")
 
-cols = st.columns(4)
-opcion = None
+# BARRA DESLIZANTE CON 5 CLASIFICACIONES
+animo = st.select_slider(
+    label="Deslice para elegir su estado:",
+    options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"]
+)
 
-with cols[0]:
-    if st.button("Triste"): opcion = "Triste"
-with cols[1]:
-    if st.button("Normal"): opcion = "Normal"
-with cols[2]:
-    if st.button("Feliz"): opcion = "Feliz"
-with cols[3]:
-    if st.button("Super"): opcion = "Súper"
-
-if opcion:
+if animo != "Seleccione":
     chiste = random.choice(lista_chistes)
     foto = random.choice(fotos_galeria)
     
     st.info(chiste)
     
-    if opcion == "Feliz" or opcion == "Súper":
+    if animo in ["FELIZ", "MUY FELIZ"]:
         st.balloons()
-        if opcion == "Súper": st.snow()
+        if animo == "MUY FELIZ":
+            st.snow()
     
     st.image(foto, use_container_width=True)
 
+# BOTÓN WHATSAPP LIMPIO
 st.markdown(f"""
     <div class="whatsapp-container">
         <a href="https://wa.me/56992238085" class="whatsapp-btn">
