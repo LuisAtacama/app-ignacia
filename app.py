@@ -18,7 +18,7 @@ st.title(f"❤️ ¡Hola, mi Señora {palabra_del_dia}!")
 
 st.subheader("💬 ¿Cómo se siente hoy?")
 animo = st.select_slider(
-    "Mueve la barrita para que papá te responda:",
+    "Mueva la barrita, llegará una sorpresa:",
     options=["Selecciona", "Triste", "Normal", "Feliz", "¡Súper Feliz!"]
 )
 
@@ -27,7 +27,7 @@ st.write("---")
 # --- RESPUESTA DINÁMICA ---
 
 if animo == "Selecciona":
-    st.write("Mueve la barrita de arriba para ver qué tiene papá para ti hoy...")
+    st.write("La amo infinito hijita")
 
 else:
     # 1. Mensajes y contenido según el ánimo
