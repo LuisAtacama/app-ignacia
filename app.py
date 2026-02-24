@@ -2,10 +2,10 @@ import streamlit as st
 import random
 
 # 1. Configuración de la página
-st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
+st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO: BOTONES ILUSTRADOS REDONDOS ---
-foto_fondo = "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"
+# --- DISEÑO: FONDO 3D Y BOTONES SEPARADOS ---
+foto_fondo = "https://i.postimg.cc/QMCp9rvq/IMG-5480.jpg" 
 
 st.markdown(f"""
     <style>
@@ -17,83 +17,71 @@ st.markdown(f"""
         background-size: cover;
     }}
     
-    .main {{
-        background-color: rgba(0, 0, 0, 0.65); 
-        padding: 30px;
-        border-radius: 20px;
-        margin: 10px;
-        font-family: 'Inter', sans-serif;
+    /* Escudo Blanco Central (Contenedor de la App) */
+    .main .block-container {{
+        background-color: rgba(255, 255, 255, 0.95); 
+        padding: 40px !important;
+        border-radius: 40px;
+        margin-top: 50px;
+        border: 4px solid #FFD700;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }}
 
-    h1, h2, h3, p, span, label, .stMarkdown, .stSubheader {{
-        color: white !important;
+    h1, h2, h3, p, div {{
+        color: #333333 !important;
         font-family: 'Inter', sans-serif !important;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        text-align: center;
     }}
 
-    /* Estilo de los 4 botones redondos con imágenes */
+    /* Estilo de los Botones Redondos SEPARADOS */
     div.stButton > button {{
-        width: 120px;
-        height: 120px;
+        width: 80px !important;
+        height: 80px !important;
         border-radius: 50% !important;
         background-color: #FFFFFF !important;
-        border: 4px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
+        border: 2px solid #F0F0F0;
         display: block;
-        margin: 0 auto;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        background-size: 70% !important; /* Ajusta el tamaño de la ilustración dentro */
+        margin: 10px auto !important; /* Margen para separarlos */
+        background-size: 80% !important;
         background-repeat: no-repeat !important;
         background-position: center !important;
-        color: transparent !important; /* Esconde el texto del botón */
+        color: transparent !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
     }}
 
-    /* Imágenes para cada botón (Ilustraciones minimalistas) */
-    /* Triste */
-    div.stButton:nth-child(1) > button {{
-        background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160738.png") !important;
-    }}
-    /* Normal */
-    div.stButton:nth-child(2) > button {{
-        background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160713.png") !important;
-    }}
-    /* Feliz */
-    div.stButton:nth-child(3) > button {{
-        background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160753.png") !important;
-    }}
-    /* Súper Feliz */
-    div.stButton:nth-child(4) > button {{
-        background-image: url("https://cdn-icons-png.flaticon.com/512/4160/4160721.png") !important;
-    }}
-    
     div.stButton > button:hover {{
-        transform: translateY(-5px);
-        box-shadow: 0 12px 25px rgba(255, 255, 255, 0.2);
-        background-color: #fcfcfc !important;
+        transform: scale(1.15);
+        border-color: #FFD700;
     }}
 
-    .stInfo {{
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
-        border-radius: 15px;
-    }}
+    /* Caritas asignadas (usando links de referencia) */
+    /* Triste */
+    div.stButton:nth-of-type(1) > button {{ background-image: url("https://i.postimg.cc/8z0Nf3pP/carita-triste.png") !important; }}
+    /* Normal */
+    div.stButton:nth-of-type(2) > button {{ background-image: url("https://i.postimg.cc/XvBfLz0W/carita-normal.png") !important; }}
+    /* Feliz */
+    div.stButton:nth-of-type(3) > button {{ background-image: url("https://i.postimg.cc/Y9S5YF9X/carita-feliz.png") !important; }}
+    /* Súper */
+    div.stButton:nth-of-type(4) > button {{ background-image: url("https://i.postimg.cc/mD8XQ0Xv/carita-super.png") !important; }}
 
+    /* Botón MENSAJE A PAPI */
     .papi-btn {{
         background-color: #25D366;
         color: white !important;
-        padding: 18px 35px;
-        border-radius: 50px;
+        padding: 15px 40px;
+        border-radius: 20px;
         text-decoration: none !important;
-        display: inline-flex;
-        align-items: center;
         font-weight: bold;
-        letter-spacing: 1px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        display: inline-block;
+        font-size: 18px;
+        text-transform: uppercase;
+        margin-top: 20px;
     }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. BANCO DE DATOS ---
+# --- 2. DATOS ---
 fotos_galeria = ["https://i.postimg.cc/26433cj7/IMG-5004.jpg", "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg", "https://i.postimg.cc/SsWjjTQz/IMG-5038.jpg", "https://i.postimg.cc/858jpQG5/IMG-5046.jpg", "https://i.postimg.cc/dV17njnY/IMG-5047.jpg", "https://i.postimg.cc/zXpbncw5/IMG-5065.jpg", "https://i.postimg.cc/02ZMpBGq/IMG-5072.jpg", "https://i.postimg.cc/TYQLr4Vz/IMG-5075.jpg", "https://i.postimg.cc/dtnk8x2n/IMG-5078.jpg", "https://i.postimg.cc/YqtLLHWF/IMG-5084.jpg", "https://i.postimg.cc/xT9NN2zJ/IMG-5093.jpg", "https://i.postimg.cc/Dy744TXW/IMG-5094.jpg", "https://i.postimg.cc/HsT88gyy/IMG-5095.jpg", "https://i.postimg.cc/FzVfCP2H/IMG-5096.jpg", "https://i.postimg.cc/br9GV6Kh/IMG-5097.jpg", "https://i.postimg.cc/rsNdZhvq/IMG-5098.jpg", "https://i.postimg.cc/7hnCtBpw/IMG-5099.jpg", "https://i.postimg.cc/Vv8rRyZH/IMG-5107.jpg", "https://i.postimg.cc/63R4n6cY/IMG-5111.jpg", "https://i.postimg.cc/rmWRxyjg/IMG-5114.jpg", "https://i.postimg.cc/ZR3vpYHL/IMG-5115.jpg", "https://i.postimg.cc/cHYtw1hm/IMG-5117.jpg", "https://i.postimg.cc/0QmKD5nM/IMG-5119.jpg", "https://i.postimg.cc/B6DPHZpj/IMG-5123.jpg", "https://i.postimg.cc/s2bZMGYS/IMG-5137.jpg", "https://i.postimg.cc/DzRbS4rL/IMG-5163.jpg", "https://i.postimg.cc/MGgjnf7S/IMG-5186.jpg", "https://i.postimg.cc/0NhJzKpT/IMG-5189.jpg", "https://i.postimg.cc/6Q8v6fvK/IMG-5200.jpg", "https://i.postimg.cc/Gp4y3xyn/IMG-5204.jpg", "https://i.postimg.cc/bwCnjBdT/IMG-5214.jpg", "https://i.postimg.cc/FHWSQB1f/IMG-5215.jpg", "https://i.postimg.cc/251Zj7Zp/IMG-5239.jpg", "https://i.postimg.cc/fbV9Wf07/IMG-5241.jpg", "https://i.postimg.cc/g2ShPTr6/IMG-5254.jpg", "https://i.postimg.cc/wjTNZpqZ/IMG-5256.jpg", "https://i.postimg.cc/W1bZCvNQ/IMG-5282.jpg", "https://i.postimg.cc/FHsS84rq/IMG-5285.jpg", "https://i.postimg.cc/HksMRgYP/IMG-5290.jpg", "https://i.postimg.cc/qMGn1RTG/IMG-5291.jpg", "https://i.postimg.cc/hPnT8mHf/IMG-5295.jpg", "https://i.postimg.cc/fTsm7d6M/IMG-5315.jpg", "https://i.postimg.cc/fWmY0CgL/IMG-5316.jpg", "https://i.postimg.cc/8kMLr4nk/IMG-5317.jpg", "https://i.postimg.cc/gjVRFc6R/IMG-5324.jpg", "https://i.postimg.cc/sxdSNG1y/IMG-5365.jpg", "https://i.postimg.cc/L5Kfbg5T/IMG-5367.jpg", "https://i.postimg.cc/fynXrSyC/IMG-5371.jpg", "https://i.postimg.cc/0jRmBKjp/IMG-5378.jpg", "https://i.postimg.cc/W4y00Hvd/IMG-5384.jpg", "https://i.postimg.cc/XvqwG0tm/IMG-5395.jpg", "https://i.postimg.cc/VNvjrc27/IMG-5449.jpg", "https://i.postimg.cc/BvbxLGRV/IMG-5473.jpg", "https://i.postimg.cc/QMCp9rvq/IMG-5480.jpg", "https://i.postimg.cc/R0hc6z2G/IMG-5486.jpg", "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"]
 lista_chistes = ["— En Hawai uno no se hospeda, se aloha.", "— ¿Cómo se llama el campeón japonés de buceo? Tokofondo. ¿Y el segundo? Kasitoko.", "— Ayer pasé por su casa y me tiró una palta… qué palta de respeto.", "— Robinson Crusoe y lo atropellaron.", "— El otro día vi a un otaku triste y lo animé.", "— Ayer metí un libro de récords en la batidora y batí todos los récords.", "— ¿Qué le dice un pan a otro pan? Le presento una miga.", "— Cuando esté triste abraza un zapato. Un zapato consuela.", "— Doctor, doctor, tengo un hueso afuera. ¡Hágalo pasar!", "— Una señora llorando llega a una zapatería: ¿Tiene zapatos de cocodrilo? ¿Qué número calza su cocodrilo?", "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo: Game Over.", "— Un tipo va al oculista. —Mire la pared. —¿Cuál pared?", "— ¿Cómo se llama su padre? —Igual. —¿Don Igual? —Sí.", "— Un español le pregunta a un inglés: Firemen. —Nosotros por teléfono.", "— ¿Se sabe el chiste del tarro? —No. —¡Qué lata!", "— Había un niñito que se llamaba Tarea. Tarea para la casa. Y Tarea se fue.", "— Tengo un perro que dice “Hola”. —En mi casa tengo un tarro que dice “Nescafé”.", "— ¿Qué le dijo un poste de luz a otro? El último apaga la luz.", "— ¿Aló, está Joaco? —No, Joaco Imprar.", "— Señorita, ¿hayalletas? (Hay galletas)", "— ¿Cómo estornuda un tomate? ¡Ketchup!", "— ¿Qué le dijo un árbol a otro? Nos dejaron plantados.", "— ¿Qué le dijo un techo a otro? Techo de menos.", "— ¿Qué hace una abeja en el gimnasio? Zum-ba.", "— Robinson Crusoe… quedó solo.", "— ¿Cuántos pelos tiene la cola de un caballo? 30.583. ¿Y cómo lo sabe? Esa es otra pregunta."]
 
@@ -103,40 +91,35 @@ if 'saludo' not in st.session_state:
 
 # --- 4. INTERFAZ ---
 st.title(f"❤️ ¡Hola, mi Señora {st.session_state.saludo}!")
-st.subheader("¿Cómo se siente usted hoy?")
+st.write("### ¿Cómo se siente usted hoy?")
 
-# Contenedor para botones
+# Botones SEPARADOS usando columnas
 cols = st.columns(4)
 opcion = None
 
 with cols[0]:
-    if st.button(" "): opcion = "Triste"
+    if st.button("T"): opcion = "Triste"
 with cols[1]:
-    if st.button("  "): opcion = "Normal"
+    if st.button("N"): opcion = "Normal"
 with cols[2]:
-    if st.button("   "): opcion = "Feliz"
+    if st.button("F"): opcion = "Feliz"
 with cols[3]:
-    if st.button("    "): opcion = "Súper"
-
-st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("S"): opcion = "Súper"
 
 if opcion:
     chiste = random.choice(lista_chistes)
     foto = random.choice(fotos_galeria)
     
-    if opcion == "Triste":
-        st.write("### Mi niñita, un chiste fome para alegrar el día:")
-    elif opcion == "Normal":
-        st.write("### ¡Disfrute su día! Aquí uno quizás no tan fome:")
-    else:
-        st.write("### ¡Esa es mi hija! ¡A celebrar!")
+    st.markdown(f"#### Para mi niñita {st.session_state.saludo}:")
+    st.info(chiste)
+    
+    if opcion == "Feliz" or opcion == "Súper":
         st.balloons()
         if opcion == "Súper": st.snow()
     
-    st.info(chiste)
     st.image(foto, use_container_width=True)
 
-st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 st.markdown(f"""
     <div style="text-align: center;">
         <a href="https://wa.me/56992238085" class="papi-btn">
