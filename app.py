@@ -1,10 +1,39 @@
 import streamlit as st
 import random
 
-# Configuración de la página
+# 1. Configuración de la página
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
 
-# --- 1. LISTADO DE PALABRAS PARA EL SALUDO ---
+# --- DISEÑO SOFISTICADO (CSS) ---
+st.markdown("""
+    <style>
+    /* Cambiar el fondo de la app */
+    .stApp {
+        background-color: #fdf5f7;
+    }
+    /* Estilizar los títulos */
+    h1 {
+        color: #d63384;
+        font-family: 'Georgia', serif;
+        text-align: center;
+    }
+    /* Estilizar el cuadro del chiste */
+    .stInfo {
+        background-color: #ffffff;
+        border-left: 5px solid #d63384;
+        border-radius: 15px;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    /* Botón de WhatsApp más elegante */
+    div.stButton > button {
+        background-color: #25d366;
+        color: white;
+        border-radius: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- 2. LISTADOS ---
 palabras = [
     "Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", 
     "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", 
@@ -12,7 +41,6 @@ palabras = [
     "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"
 ]
 
-# --- 2. LISTADO DE CHISTES (TU LISTA DE 26) ---
 lista_chistes = [
     "— En Hawai uno no se hospeda, se aloha.",
     "— ¿Cómo se llama el campeón japonés de buceo? Tokofondo. ¿Y el segundo? Kasitoko.",
@@ -28,7 +56,7 @@ lista_chistes = [
     "— Un tipo va al oculista. —Mire la pared. —¿Cuál pared?",
     "— ¿Cómo se llama su padre? —Igual. —¿Don Igual? —Sí.",
     "— Un español le pregunta a un inglés: ¿Cómo llaman a los bomberos? —Firemen. —Nosotros por teléfono.",
-    "— ¿Se sabe el chiste del tarro? —No. —¡Qué lata!",
+    "— ¿Te sabes el chiste del tarro? —No. —¡Qué lata!",
     "— Había un niñito que se llamaba Tarea. Tarea para la casa. Y Tarea se fue.",
     "— Tengo un perro que dice “Hola”. —En mi casa tengo un tarro que dice “Nescafé”.",
     "— ¿Qué le dijo un poste de luz a otro? El último apaga la luz.",
@@ -55,16 +83,18 @@ if 'saludo' not in st.session_state:
 # --- INICIO DE LA APP ---
 st.title(f"❤️ ¡Hola, mi Señora {st.session_state.saludo}!")
 
+st.markdown(f"<p style='text-align: center; font-style: italic;'>Dedicado con todo mi amor para usted.</p>", unsafe_allow_html=True)
+
 st.subheader("💬 ¿Cómo se siente usted hoy?")
 animo = st.select_slider(
-    "Mueva la barrita para que papá le responda:",
+    "Deslice la barrita para que papá le responda:",
     options=["Seleccione", "Triste", "Normal", "Feliz", "¡Súper Feliz!"]
 )
 
-st.write("---")
+st.divider()
 
 if animo == "Seleccione":
-    st.write("Mueva la barrita de arriba para ver qué tiene papá para usted hoy...")
+    st.write("✨ Mueva la barrita de arriba para recibir un mensaje especial...")
 
 else:
     if chiste_del_momento not in st.session_state.chistes_vistos:
@@ -73,12 +103,12 @@ else:
     if animo == "Triste":
         st.write("### Mi niñita, un chiste fome para alegrar el día. Mire:")
         st.info(chiste_del_momento)
-        st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg")
+        st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
 
     elif animo == "Normal":
         st.write("### ¡Disfrute su día! Aquí otro quizás no tan fome:")
         st.info(chiste_del_momento)
-        st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg")
+        st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg", use_container_width=True)
 
     elif animo == "Feliz":
         st.write("### ¡Esa es mi hija! Mire este video:")
@@ -91,5 +121,5 @@ else:
         st.balloons()
         st.snow()
 
-    st.write("---")
+    st.divider()
     st.link_button("💌 ENVIARLE UN MENSAJE A PAPÁ", "https://wa.me/56992238085")
