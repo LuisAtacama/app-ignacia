@@ -4,13 +4,21 @@ st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
 
 st.title("❤️ ¡Bienvenida, mi Señora Matemáticas!")
 
-# --- SECCIÓN DE FOTOS ---
-st.subheader("📸 Galería de Recuerdos")
+# --- SECCIÓN DE FOTOS REALES ---
+st.subheader("📸 Nuestros Momentos Especiales")
 col1, col2 = st.columns(2)
+
 with col1:
-    st.image("https://images.unsplash.com/photo-1559454403-b8fb88521f11?w=400", caption="Nuestra primera foto")
+    # Foto de la Ignacia con filtro de lentes
+    st.image("https://lh3.googleusercontent.com/d/1xSqdAD-zfwKqtuNmDT4ucUTzPGduc7SI", caption="¡Qué estilo!")
+    # Foto de ustedes dos juntos
+    st.image("https://lh3.googleusercontent.com/d/1C1KzunB5hbOmj2IjIcyvPDFfSA8OAKEl", caption="Compañeros de aventuras")
+
 with col2:
-    st.image("https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400", caption="¡Te amo mucho!")
+    # Foto de la Ignacia sonriendo
+    st.image("https://lh3.googleusercontent.com/d/1MggbWh6rNt6smCp4SSlvCcWzmG5sDLkJ", caption="Tu sonrisa ilumina todo")
+    # Foto divertida de la Ignacia
+    st.image("https://lh3.googleusercontent.com/d/1JUtxjcW0ZfBhKYrurYV6KPVNGvsPRFIm", caption="¡Momentos felices!")
 
 # --- SECCIÓN DE VIDEO ---
 st.subheader("📺 Un video para ti")
