@@ -13,26 +13,22 @@ animo = st.select_slider(
 
 st.write("---")
 
-# --- RESPUESTA DINÁMICA CON VIDEOS DE DRIVE ---
+# --- VIDEO ÚNICO DE DRIVE ---
+# Este es el nuevo video que me pasaste
+st.subheader("📺 Un video especial para ti")
+st.video("https://drive.google.com/uc?export=download&id=1wk7a_c_hY1N9eQlrjdBRT1tdbtnxcwtn")
 
-if animo == "Triste" or animo == "Normal":
-    st.subheader("🐶 ¡Un regalito para que sonrías!")
-    st.write("Mira este video que te preparé:")
-    # Video del perrito/mascota
-    st.video("https://drive.google.com/uc?export=download&id=1CpEGP3sQrKJuPPaX823rf72g9Pyp0PnX")
-    st.info("¡Papá siempre está aquí para hacerte reír!")
-
-elif animo == "Feliz" or animo == "¡Súper Feliz!":
-    st.subheader("💃 ¡Ese es el ánimo!")
-    st.write("¡Me encanta verte así de contenta! Mira:")
-    # Video de ella bailando/feliz
-    st.video("https://drive.google.com/uc?export=download&id=1FtAyAEg5zW6D8qm46Fh1N-RXOSrJyir_")
+# Reacciones según el ánimo
+if animo == "Triste":
+    st.info("Hija, aunque estés triste, recuerda que siempre te haré sonreír. ¡Mira el video!")
+elif animo == "¡Súper Feliz!":
+    st.success("¡Esa alegría es contagiosa! ¡Eres la mejor!")
     st.balloons()
-    if animo == "¡Súper Feliz!":
-        st.snow()
-        st.success("¡Eres la mejor, Ignacia! Que nada te quite esa sonrisa.")
+    st.snow()
+else:
+    st.write("¡Espero que te guste este video que elegí para ti! ❤️")
 
-# --- SECCIÓN DE FOTOS (Las que ya teníamos) ---
+# --- SECCIÓN DE FOTOS ---
 st.write("---")
 st.subheader("📸 Nuestros Recuerdos")
 col1, col2 = st.columns(2)
@@ -42,7 +38,7 @@ with col2:
     st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg", caption="Tu alegría")
 
 st.write("---")
-# RECUERDA: Pon tu número de WhatsApp real aquí
+# RECUERDA: Pon tu número de WhatsApp real aquí (ej: https://wa.me/56912345678)
 st.link_button("💌 MANDARLE UN MENSAJE A PAPÁ", "https://wa.me/569XXXXXXXX")
 
 st.caption("Hecho con ❤️ por tu papá.")
