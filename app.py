@@ -1,10 +1,10 @@
 import streamlit as st
 import random
 
-# 1. CONFIGURACIÓN DE PÁGINA
+# 1. CONFIGURACIÓN
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO CSS (BLANCO PULCRO) ---
+# --- DISEÑO CSS (BLANCO TOTAL) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -26,47 +26,60 @@ st.markdown("""
     .whatsapp-btn {
         background-color: #25D366; color: white !important; padding: 14px 28px;
         border-radius: 50px; text-decoration: none !important; font-weight: 700;
-        display: inline-flex; align-items: center; gap: 10px; font-size: 16px;
+        display: inline-flex; align-items: center; gap: 10px;
     }
     .stTextInput > div > div > input { border-radius: 25px; border: 1px solid #DDD; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. EL CEREBRO DE PAPI (ADN DE LUIS) ---
+# --- 2. EL CEREBRO DE PAPI (ADN LUIS) ---
 def obtener_respuesta_papa(texto):
     texto = texto.lower()
-    abrazo = " Le mando un abrazo hijita linda."
     
-    # 1. TRISTEZA O MIEDO (Aquí SIEMPRE va el abrazo)
+    # Base de datos de respuestas variadas según su chat real
+    respuestas = {
+        "pena": [
+            "Está bien ponerse triste hijita linda, eso es parte de la vida. No se guarde nada, ponga fuera lo que siente. No hay nada que cambiar en usted, es increíble tal como es.",
+            "Pucha mi niñita, me da pena que esté así. Pero aquí estamos para apoyarla siempre. Respire profundo... le mando un abrazo hijita linda.",
+            "A veces el corazón necesita soltar un poquito de lluvia. Mañana será un mejor día, ya verá. La amo mucho siempre."
+        ],
+        "logros": [
+            "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó de vivaldi!",
+            "¡Excelente! Usted es una niña muy inteligente y valiente. ¡Qué buena noticia me da!",
+            "Saca muy buenas fotos y hace cosas preciosas, se pasó hijita. ¡Usted es una artista!"
+        ],
+        "colegio": [
+            "Ok hijita, vamos por partes. No se abrume por las tareas. Si algo está difícil, lo revisamos juntos. Hay que tener paciencia pero lo vamos a lograr.",
+            "Usted es súper capaz e inteligente. No se castigue si algo no sale a la primera, lo importante es el esfuerzo que pone siempre."
+        ],
+        "amor": [
+            "Ay mi niñita, los temas del corazón son enredados. Lo más importante es que aprenda a escucharse y a quererse mucho usted primero. Le mando un abrazo hijita linda.",
+            "Dése tiempo, no se apure con esas cosas. Su felicidad y que se sienta bien es lo que más me importa a mí."
+        ],
+        "distancia": [
+            "Yo también la extraño mucho, mi chiquitita linda. Me encantaría estar ahí con usted ahora, pero sepa que mi corazón está al ladito suyo siempre. Le mando un abrazo hijita linda.",
+            "Aunque no esté ahí físicamente, sepa que cuenta conmigo para todo. No está sola nunca."
+        ]
+    }
+
+    # Lógica de detección
     if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "asusto", "pucha"]):
-        return ("Está bien ponerse así mi chiquitita, es normal. No se guarde nada. "
-                "Desde acá la acompaño con todo mi corazón y no hay nada que cambiar en usted, "
-                "es increíble tal como es." + abrazo)
+        return random.choice(respuestas["pena"])
         
-    # 2. TEMAS DEL CORAZÓN (Abrazo necesario por contención)
-    if any(k in texto for k in ["gustar", "niño", "niña", "corazon", "enamorada", "alguien"]):
-        return ("Ay mi niñita, los temas del corazón son enredados. Lo más importante es que aprenda a "
-                "escuchar su cuerpo y a cuidarse con mucho cariño. Su felicidad es lo primero para mí." + abrazo)
+    if any(k in texto for k in ["gane", "bien", "logre", "mira", "foto", "dibujo", "pinte", "nota"]):
+        return random.choice(respuestas["logros"])
 
-    # 3. COLEGIO (Abrazo opcional/aleatorio)
-    if any(k in texto for k in ["colegio", "tarea", "prueba", "nota", "clase", "profe"]):
-        res = ("Ok hijita, vamos por partes. No se abrume, que usted es muy inteligente y habilosa. "
-               "Pucha, hay que tener paciencia pero lo vamos a lograr entre los dos.")
-        return res + abrazo if random.random() > 0.5 else res
+    if any(k in texto for k in ["colegio", "tarea", "prueba", "clase", "profe"]):
+        return random.choice(respuestas["colegio"])
 
-    # 4. EXTRAÑAR (Aquí SIEMPRE va el abrazo)
+    if any(k in texto for k in ["gustar", "corazon", "enamorada", "alguien", "niño", "niña"]):
+        return random.choice(respuestas["amor"])
+
     if any(k in texto for k in ["extraño", "papi", "verte", "donde", "te quiero"]):
-        return ("¡Yo también la extraño mucho, hijita linda! Me encantaría estar ahí, "
-                "pero le envío todo mi amor por aquí. Mi corazón está al ladito suyo siempre." + abrazo)
+        return random.choice(respuestas["distancia"])
 
-    # 5. LOGROS (Aquí no va el abrazo, va CELEBRACIÓN)
-    if any(k in texto for k in ["gane", "bien", "logre", "mira", "foto", "dibujo", "pinte"]):
-        return ("¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó! "
-                "Tiene un gusto excelente para todo lo que hace, mi artista favorita.")
-
-    # 6. RESPUESTA POR DEFECTO (Aleatorio)
-    res_def = "Mi niñita linda, cuénteme más. Usted sabe que siempre voy a estar atento a lo que necesite."
-    return res_def + abrazo if random.random() > 0.7 else res_def
+    return ("Mi niñita linda, cuénteme más. Usted sabe que siempre voy a estar atento a lo que necesite y "
+            "aquí estoy para escucharla. La amo mucho siempre.")
 
 # --- 3. BANCO DE FOTOS ---
 fotos_galeria = [
@@ -118,7 +131,7 @@ if animo != "Seleccione":
     st.markdown("<p style='text-align:center; font-style:italic; font-size:18px;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
     if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
 
-# BOTÓN WHATSAPP
+# WHATSAPP
 st.markdown(f"""
     <div class="whatsapp-container">
         <a href="https://wa.me/56992238085" class="whatsapp-btn">
