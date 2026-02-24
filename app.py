@@ -44,6 +44,6 @@ elif animo == "¡Súper Feliz!":
 
 st.write("---")
 # No olvides poner tu número real aquí:
-st.link_button("💌 CUÉNTAME MÁS POR WHATSAPP", "https://wa.me/569XXXXXXXX")
+st.link_button("💌 CUÉNTAME MÁS POR WHATSAPP", "https://wa.me/56992238085")
 
 st.caption("Tu app se actualiza según tu corazón. ❤️")
