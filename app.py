@@ -4,8 +4,7 @@ import random
 # 1. Configuración de la página
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
 
-# --- DISEÑO MODERNO CON FONDO ILUSTRACIÓN ---
-# He seleccionado la imagen que evoca el estilo solicitado
+# --- DISEÑO MODERNO: BOTONES REDONDOS Y LETRAS BLANCAS ---
 foto_fondo = "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"
 
 st.markdown(f"""
@@ -18,51 +17,64 @@ st.markdown(f"""
         background-size: cover;
     }}
     
-    /* Capa de protección blanca (Escudo Blanco) */
+    /* Capa oscura para que las letras blancas resalten */
     .main {{
-        background-color: rgba(255, 255, 255, 0.8); 
+        background-color: rgba(0, 0, 0, 0.6); 
         padding: 30px;
         border-radius: 20px;
         margin: 10px;
         font-family: 'Inter', sans-serif;
     }}
 
-    /* Textos en blanco con sombra para máxima legibilidad si salen del escudo */
-    h1, h2, h3, p, span, label, .stMarkdown {{
-        color: #222222 !important; /* Texto oscuro sobre escudo blanco */
+    /* Todo el texto de la app en BLANCO */
+    h1, h2, h3, p, span, label, .stMarkdown, .stSubheader {{
+        color: white !important;
         font-family: 'Inter', sans-serif !important;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }}
 
-    /* Estilo de botones modernos (Caras/Iconos) */
+    /* Estilo de BOTONES REDONDOS BLANCOS SÓLIDOS */
     div.stButton > button {{
-        width: 100%;
-        border-radius: 12px;
-        height: 60px;
-        font-size: 18px;
-        background-color: #FFFFFF;
-        color: #d63384;
-        border: 2px solid #f0f0f0;
+        width: 100px;
+        height: 100px;
+        border-radius: 50% !important; /* Totalmente redondos */
+        background-color: #FFFFFF !important; /* Blanco Sólido */
+        color: #333333 !important; /* Letra oscura dentro del botón para leer el emoji/texto */
+        border: none;
+        font-size: 16px;
+        font-weight: bold;
         transition: all 0.3s ease;
+        display: block;
+        margin: 0 auto;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }}
     
     div.stButton > button:hover {{
-        background-color: #fce4ec;
-        border-color: #d63384;
+        transform: scale(1.1);
+        background-color: #f0f0f0 !important;
     }}
 
-    /* Botón WhatsApp: "MENSAJE A PAPI" */
+    /* Caja de chistes con fondo traslúcido y letra blanca */
+    .stInfo {{
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+    }}
+
+    /* Botón WhatsApp: MENSAJE A PAPI */
     .papi-btn {{
         background-color: #25D366;
         color: white !important;
         padding: 18px 35px;
-        border-radius: 12px;
-        text-decoration: none !important; /* Quita el subrayado */
+        border-radius: 50px;
+        text-decoration: none !important;
         display: inline-flex;
         align-items: center;
         font-weight: bold;
         letter-spacing: 1px;
         font-size: 16px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -106,28 +118,30 @@ lista_chistes = [
     "— Robinson Crusoe… quedó solo.", "— ¿Cuántos pelos tiene la cola de un caballo? 30.583. ¿Y cómo lo sabe? Esa es otra pregunta."
 ]
 
-# --- 3. INICIO ---
+# --- 3. LÓGICA ---
 if 'saludo' not in st.session_state:
     st.session_state.saludo = random.choice(["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", "De La Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"])
 
+# --- 4. INTERFAZ ---
 st.title(f"❤️ ¡Hola, mi Señora {st.session_state.saludo}!")
-st.write("### ¿Cómo se siente usted hoy?")
+st.subheader("¿Cómo se siente usted hoy?")
 
+# Botones en 2 filas y 2 columnas, bien centrados
 col1, col2 = st.columns(2)
 col3, col4 = st.columns(2)
 
 opcion = None
 
 with col1:
-    if st.button("😔 Triste"): opcion = "Triste"
+    if st.button("😔"): opcion = "Triste"
 with col2:
-    if st.button("😐 Normal"): opcion = "Normal"
+    if st.button("😐"): opcion = "Normal"
 with col3:
-    if st.button("😊 Feliz"): opcion = "Feliz"
+    if st.button("😊"): opcion = "Feliz"
 with col4:
-    if st.button("🚀 ¡Súper!"): opcion = "Súper"
+    if st.button("🚀"): opcion = "Súper"
 
-st.write("---")
+st.markdown("<br>", unsafe_allow_html=True)
 
 if opcion:
     chiste = random.choice(lista_chistes)
@@ -135,19 +149,17 @@ if opcion:
     
     if opcion == "Triste":
         st.write("### Mi niñita, un chiste fome para alegrar el día:")
-        st.info(chiste)
     elif opcion == "Normal":
         st.write("### ¡Disfrute su día! Aquí uno quizás no tan fome:")
-        st.info(chiste)
     else:
         st.write("### ¡Esa es mi hija! ¡A celebrar!")
         st.balloons()
-        st.info(chiste)
+        if opcion == "Súper": st.snow()
     
+    st.info(chiste)
     st.image(foto, use_container_width=True)
 
-st.write("---")
-# BOTÓN FINAL SIN SUBRAYAR Y EN MAYÚSCULAS
+st.markdown("<br><br>", unsafe_allow_html=True)
 st.markdown(f"""
     <div style="text-align: center;">
         <a href="https://wa.me/56992238085" class="papi-btn">
