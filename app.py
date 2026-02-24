@@ -4,7 +4,7 @@ import random
 # 1. CONFIGURACIÓN
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO CSS ---
+# --- DISEÑO ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -13,7 +13,7 @@ st.markdown("""
     h1, h3, p { color: #1A1A1A !important; text-align: center; font-family: 'Inter', sans-serif; }
     .stInfo { 
         background-color: #F8F9FA !important; border-radius: 20px; border: 1px solid #EEE;
-        color: #1A1A1A !important; padding: 25px !important; font-size: 18px;
+        color: #1A1A1A !important; padding: 25px !important; font-size: 19px;
     }
     .whatsapp-btn {
         background-color: #25D366; color: white !important; padding: 14px 28px;
@@ -22,30 +22,34 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. EL MOTOR DE RESPUESTA DINÁMICO (ESTILO LUIS) ---
-def responder_como_papi_vivaldi(texto):
+# --- 2. MOTOR DE CONVERSACIÓN DINÁMICO (ADN LUIS) ---
+def responder_como_papi(texto):
     texto = texto.lower()
     
-    # Piezas de su lenguaje real
-    preocupacion = ["¿Pero hijita está bien?", "¿Qué pasó mi chiquitita?", "¿Le pasó algo malo?", "Pucha mi niñita, cuénteme bien."]
-    reaccion_vivaldi = ["Hay que estar Vivaldi po.", "Pucha más Vivaldi po mi niñita.", "Ya po, estemos Vivaldi con eso.", "Hay que estar atenta e inteligente."]
-    apoyo = ["No hay nada que cambiar en usted.", "Usted es increíble tal como es.", "Acuérdese que es súper capaz.", "Lo vamos a arreglar juntos."]
-    
-    # Lógica de construcción
-    if any(k in texto for k in ["triste", "pena", "mal", "miedo", "pucha"]):
-        msg = f"{random.choice(preocupacion)} {random.choice(reaccion_vivaldi)} {random.choice(apoyo)} Le mando un abrazo apretado."
-    
-    elif any(k in texto for k in ["colegio", "tarea", "nota", "prueba"]):
-        msg = f"¿Y cómo le fue? {random.choice(reaccion_vivaldi)} No se abrume, vamos por partes. Le mando un abrazo apretado."
-        
-    elif any(k in texto for k in ["gane", "bien", "logre", "mira", "foto"]):
-        msg = "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó de Vivaldi!"
-    
-    else:
-        # Respuesta por defecto si no detecta tema
-        msg = f"¿Pero qué pasó hijita? Cuénteme más para entenderla. {random.choice(reaccion_vivaldi)} La amo mucho siempre."
-    
-    return msg
+    # Componentes para armar respuestas diferentes cada vez
+    reacciones_pena = ["¿Pero hijita está bien?", "Pucha mi niñita, ¿le pasó algo?", "¿Qué pasó mi chiquitita?", "Cuénteme bien qué siente."]
+    consejos_pena = ["Pucha más Vivaldi po mi niñita.", "Hay que estar Vivaldi po.", "Pucha hay que tener paciencia.", "No se abrume, vamos por partes."]
+    cierres_afecto = ["Le mando un abrazo apretado.", "Aquí estoy para escucharla.", "La amo mucho siempre.", "Usted es increíble tal como es."]
+
+    # 1. CASO PENA / PROBLEMAS (Se arma una frase distinta mezclando las listas)
+    if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "pucha", "asunto"]):
+        return f"{random.choice(reacciones_pena)} {random.choice(consejos_pena)} {random.choice(cierres_afecto)}"
+
+    # 2. CASO ALEGRÍA / LOGROS (Variaciones del "Aaaaa")
+    if any(k in texto for k in ["gane", "mira", "bien", "foto", "dibujo", "nota", "lindo"]):
+        reaccion_feliz = ["¡Aaaaa que biennn!", "¡Excelente!", "¡Se pasó!", "¡Qué maravilla!"]
+        return f"{random.choice(reaccion_feliz)} Me hace sentir el papá más orgulloso del universo. ¡Se pasó de Vivaldi!"
+
+    # 3. CASO COLEGIO / AMIGAS
+    if any(k in texto for k in ["colegio", "tarea", "amiga", "profe", "clase"]):
+        return f"Ya po hijita, cuénteme bien qué pasó ahí. {random.choice(consejos_pena)} {random.choice(cierres_afecto)}"
+
+    # 4. CASO EXTRAÑAR
+    if any(k in texto for k in ["extraño", "papi", "verte", "te quiero"]):
+        return f"Yo también la extraño mucho, mi chiquitita linda. Mi corazón está al ladito suyo siempre. {random.choice(cierres_afecto)}"
+
+    # 5. DEFAULT (Si no entiende el tema)
+    return f"¿Pero qué pasó hijita? Cuénteme más para entenderla bien. {random.choice(consejos_pena)} {random.choice(cierres_afecto)}"
 
 # --- 3. BANCO DE FOTOS ---
 fotos_galeria = [
@@ -82,7 +86,8 @@ st.title("❤️ App de Ignacia")
 st.write("### 💬 Pregúntele a Papi")
 pregunta = st.text_input("Cuénteme algo, mi niñita...", key="chat_input")
 if pregunta:
-    st.info(f"👨‍👧 **Papi dice:** {responder_como_papi_vivaldi(pregunta)}")
+    # Usamos la nueva función que mezcla las respuestas
+    st.info(f"👨‍👧 **Papi dice:** {responder_como_papi(pregunta)}")
 
 st.divider()
 
@@ -92,6 +97,6 @@ animo = st.select_slider(label="Estado:", options=["Seleccione", "MUY TRISTE", "
 if animo != "Seleccione":
     foto = random.choice(fotos_galeria)
     st.image(foto, use_container_width=True)
-    st.markdown("<p style='font-style:italic;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-style:italic; font-size:18px;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
 
 st.markdown("""<div style='text-align:center; margin-top:40px;'><a href='https://wa.me/56992238085' class='whatsapp-btn'><img src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' width='24'> MENSAJE A PAPI</a></div>""", unsafe_allow_html=True)
