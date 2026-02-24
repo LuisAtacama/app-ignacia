@@ -1,81 +1,74 @@
 import streamlit as st
 import random
 
-# 1. Configuración de la página
+# 1. CONFIGURACIÓN
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO: FONDO BLANCO PLANO Y TIPOGRAFÍA MODERNA ---
-st.markdown(f"""
+# --- DISEÑO CSS (BLANCO PLANO Y MODERNO) ---
+st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-
-    /* Fondo blanco plano en toda la app */
-    .stApp {{
-        background-color: #FFFFFF;
-    }}
-    
-    /* Contenedor central limpio */
-    .main .block-container {{
+    .stApp { background-color: #FFFFFF; }
+    .main .block-container {
         background-color: #FFFFFF;
         padding: 40px !important;
         font-family: 'Inter', sans-serif;
         max-width: 600px;
-    }}
-
-    /* Textos en gris oscuro/negro para contraste sobre blanco */
-    h1, h3, p, label, .stMarkdown {{
-        color: #1A1A1A !important;
-        font-family: 'Inter', sans-serif !important;
-        text-align: center;
-    }}
-
-    h1 {{
-        font-weight: 700;
-        margin-bottom: 30px;
-    }}
-
-    /* Estilo para la barra (Slider) */
-    .stSlider {{
-        padding-top: 20px;
-        padding-bottom: 40px;
-    }}
-
-    /* Caja de chistes minimalista */
-    .stInfo {{
-        background-color: #F8F9FA !important;
-        color: #333333 !important;
-        border: 1px solid #EEEEEE !important;
-        border-radius: 15px;
+    }
+    h1, h2, h3, p, label { color: #1A1A1A !important; text-align: center; }
+    .stInfo { 
+        background-color: #F0F2F6 !important; 
+        border-radius: 20px; 
+        border: none; 
+        color: #1A1A1A !important; 
         padding: 20px !important;
-    }}
-
-    /* Botón WhatsApp: Logo + Texto (Sin subrayado) */
-    .whatsapp-container {{
-        text-align: center;
-        margin-top: 40px;
-    }}
-
-    .whatsapp-btn {{
-        background-color: #25D366;
-        color: white !important;
-        padding: 16px 32px;
-        border-radius: 50px;
-        text-decoration: none !important;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 16px;
-        transition: transform 0.2s ease;
-    }}
-    
-    .whatsapp-btn:hover {{
-        transform: scale(1.05);
-    }}
+        font-size: 18px;
+    }
+    .whatsapp-container { text-align: center; margin-top: 40px; }
+    .whatsapp-btn {
+        background-color: #25D366; color: white !important; padding: 14px 28px;
+        border-radius: 50px; text-decoration: none !important; font-weight: 700;
+        display: inline-flex; align-items: center; gap: 10px;
+    }
+    .stTextInput > div > div > input { border-radius: 25px; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. BANCO DE DATOS ACTUALIZADO ---
+# --- 2. EL CEREBRO DE PAPI (CON SU FRASE DE CIERRE) ---
+FRASE_CIERRE = "La amo mucho siempre, hijita linda."
+
+respuestas_chat = {
+    "tristeza": "Está bien ponerse triste mi chiquitita. Desde acá le envío un abrazito apretado y mucha fuerza.",
+    "colegio": "Ok hijita, vamos por partes. Cuénteme qué pasó y lo solucionamos juntos. Usted es muy inteligente.",
+    "amigas": "Recuerde que una amiga de verdad no la obliga a nada. Usted sea siempre fiel a lo que siente.",
+    "orgullo": "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del mundo. ¡Se pasó!",
+    "te_extrano": "Yo también la extraño mucho, mi niñita. Le mando el abrazo más grande del mundo hasta allá.",
+    "arte": "¡Qué buen gusto tiene, hijita! Saca fotos y hace cosas preciosas, es una artista.",
+    "fallback": "Mi niñita, cuénteme más. Aquí estoy para escucharla y acompañarla en todo."
+}
+
+def obtener_respuesta(texto):
+    texto = texto.lower()
+    keywords = {
+        "tristeza": ["triste", "pena", "mal", "pucha", "llorar"],
+        "colegio": ["colegio", "tarea", "clase", "prueba", "estudiar"],
+        "amigas": ["amiga", "pelea", "niñas", "dijo"],
+        "orgullo": ["gane", "nota", "bien", "logre", "pude"],
+        "te_extrano": ["extraño", "papi", "donde", "te quiero"],
+        "arte": ["foto", "dibujo", "pintar", "musica"]
+    }
+    
+    # Buscar coincidencia
+    respuesta_base = respuestas_chat["fallback"]
+    for intent, keys in keywords.items():
+        if any(k in texto for k in keys):
+            respuesta_base = respuestas_chat[intent]
+            break
+            
+    # Retornar respuesta combinada con su frase de oro
+    return f"{respuesta_base} {FRASE_CIERRE}"
+
+# --- 3. BANCO DE FOTOS ---
 fotos_galeria = [
     "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg",
     "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg",
@@ -101,57 +94,35 @@ fotos_galeria = [
     "https://i.postimg.cc/W4y00Hvd/IMG-5384.jpg", "https://i.postimg.cc/XvqwG0tm/IMG-5395.jpg",
     "https://i.postimg.cc/VNvjrc27/IMG-5449.jpg", "https://i.postimg.cc/BvbxLGRV/IMG-5473.jpg",
     "https://i.postimg.cc/QMCp9rvq/IMG-5480.jpg", "https://i.postimg.cc/R0hc6z2G/IMG-5486.jpg",
-    "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
+    "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"
 ]
-
-lista_chistes = [
-    "— En Hawai uno no se hospeda, se aloha.", "— ¿Cómo se llama el campeón japonés de buceo? Tokofondo. ¿Y el segundo? Kasitoko.",
-    "— Ayer pasé por su casa y me tiró una palta… qué palta de respeto.", "— Robinson Crusoe y lo atropellaron.",
-    "— El otro día vi a un otaku triste y lo animé.", "— Ayer metí un libro de récords en la batidora y batí todos los récords.",
-    "— ¿Qué le dice un pan a otro pan? Le presento una miga.", "— Cuando esté triste abraza un zapato. Un zapato consuela.",
-    "— Doctor, doctor, tengo un hueso afuera. ¡Hágalo pasar!", "— Una señora llorando llega a una zapatería: ¿Tiene zapatos de cocodrilo? ¿Qué número calza su cocodrilo?",
-    "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo: Game Over.", "— Un tipo va al oculista. —Mire la pared. —¿Cuál pared?",
-    "— ¿Cómo se llama su padre? —Igual. —¿Don Igual? —Sí.", "— Un español le pregunta a un inglés: Firemen. —Nosotros por teléfono.",
-    "— ¿Se sabe el chiste del tarro? —No. —¡Qué lata!", "— Había un niñito que se llamaba Tarea. Tarea para la casa. Y Tarea se fue.",
-    "— Tengo un perro que dice “Hola”. —En mi casa tengo un tarro que dice “Nescafé”.",
-    "— ¿Aló, está Joaco? —No, Joaco mprar.", "— Señorita, ¿hayalletas? (Hay galletas)",
-    "— ¿Cómo estornuda un tomate? ¡Ketchup!", "— ¿Qué le dijo un árbol a otro? Nos dejaron plantados.",
-    "— ¿Qué le dijo un techo a otro? Techo de menos.", "— ¿Qué hace una abeja en el gimnasio? Zum-ba.",
-    "— ¿Cuántos pelos tiene la cola de un caballo? 30.583. ¿Y cómo lo sabe? Esa es otra pregunta."
-]
-
-# --- 3. LÓGICA ---
-if 'saludo' not in st.session_state:
-    st.session_state.saludo = random.choice(["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", "De La Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"])
 
 # --- 4. INTERFAZ ---
-st.title(f"❤️ ¡Hola, mi Señora {st.session_state.saludo}!")
-st.write("### ¿Cómo se siente usted hoy?")
+st.title("❤️ App de Ignacia")
 
-# BARRA DESLIZANTE CON 5 CLASIFICACIONES
-animo = st.select_slider(
-    label="Deslice para elegir su estado:",
-    options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"]
-)
+# CHAT
+st.write("### 💬 Pregúntele a Papi")
+pregunta = st.text_input("Cuénteme algo, mi niñita...", key="chat_input")
+if pregunta:
+    st.info(f"👨‍👧 **Papi dice:** {obtener_respuesta(pregunta)}")
+
+st.divider()
+
+# ÁNIMO Y FOTOS
+st.write("### 😊 ¿Cómo se siente usted hoy?")
+animo = st.select_slider(label="Estado:", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
 
 if animo != "Seleccione":
-    chiste = random.choice(lista_chistes)
-    foto = random.choice(fotos_galeria)
-    
-    st.info(chiste)
-    
-    if animo in ["FELIZ", "MUY FELIZ"]:
-        st.balloons()
-        if animo == "MUY FELIZ":
-            st.snow()
-    
-    st.image(foto, use_container_width=True)
+    foto_rnd = random.choice(fotos_galeria)
+    st.image(foto_rnd, use_container_width=True)
+    st.markdown(f"<p style='text-align:center; font-style:italic; font-size:18px;'>\"{FRASE_CIERRE}\"</p>", unsafe_allow_html=True)
+    if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
 
-# BOTÓN WHATSAPP LIMPIO
+# WHATSAPP
 st.markdown(f"""
     <div class="whatsapp-container">
         <a href="https://wa.me/56992238085" class="whatsapp-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="24" height="24">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="24">
             MENSAJE A PAPI
         </a>
     </div>
