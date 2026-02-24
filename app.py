@@ -4,7 +4,8 @@ import random
 # 1. Configuración de la página
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
 
-# --- DISEÑO MODERNO (CSS) ---
+# --- DISEÑO MODERNO CON FONDO ILUSTRACIÓN ---
+# He seleccionado la imagen que evoca el estilo solicitado
 foto_fondo = "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg"
 
 st.markdown(f"""
@@ -17,59 +18,51 @@ st.markdown(f"""
         background-size: cover;
     }}
     
-    /* Capa oscura para legibilidad */
+    /* Capa de protección blanca (Escudo Blanco) */
     .main {{
-        background-color: rgba(0, 0, 0, 0.7); 
-        padding: 25px;
+        background-color: rgba(255, 255, 255, 0.8); 
+        padding: 30px;
         border-radius: 20px;
-        color: white !important;
+        margin: 10px;
         font-family: 'Inter', sans-serif;
     }}
 
-    /* Forzar que todos los textos sean blancos */
+    /* Textos en blanco con sombra para máxima legibilidad si salen del escudo */
     h1, h2, h3, p, span, label, .stMarkdown {{
-        color: white !important;
+        color: #222222 !important; /* Texto oscuro sobre escudo blanco */
         font-family: 'Inter', sans-serif !important;
     }}
 
-    /* Estilo para los botones de estado de ánimo */
+    /* Estilo de botones modernos (Caras/Iconos) */
     div.stButton > button {{
         width: 100%;
-        border-radius: 15px;
-        height: 80px;
-        font-size: 20px;
-        background-color: rgba(255, 255, 255, 0.1);
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        height: 60px;
+        font-size: 18px;
+        background-color: #FFFFFF;
+        color: #d63384;
+        border: 2px solid #f0f0f0;
         transition: all 0.3s ease;
     }}
     
     div.stButton > button:hover {{
-        background-color: #d63384;
+        background-color: #fce4ec;
         border-color: #d63384;
-        transform: scale(1.02);
     }}
 
-    /* Caja de chistes */
-    .stInfo {{
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: white !important;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 15px;
-    }}
-
-    /* Botón WhatsApp */
-    .whatsapp-btn {{
+    /* Botón WhatsApp: "MENSAJE A PAPI" */
+    .papi-btn {{
         background-color: #25D366;
         color: white !important;
-        padding: 15px 30px;
-        border-radius: 50px;
-        text-decoration: none;
+        padding: 18px 35px;
+        border-radius: 12px;
+        text-decoration: none !important; /* Quita el subrayado */
         display: inline-flex;
         align-items: center;
         font-weight: bold;
-        gap: 10px;
-        margin-top: 20px;
+        letter-spacing: 1px;
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }}
     </style>
     """, unsafe_allow_html=True)
@@ -113,11 +106,10 @@ lista_chistes = [
     "— Robinson Crusoe… quedó solo.", "— ¿Cuántos pelos tiene la cola de un caballo? 30.583. ¿Y cómo lo sabe? Esa es otra pregunta."
 ]
 
-# --- 3. LÓGICA ---
+# --- 3. INICIO ---
 if 'saludo' not in st.session_state:
     st.session_state.saludo = random.choice(["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", "De La Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"])
 
-# --- 4. INTERFAZ ---
 st.title(f"❤️ ¡Hola, mi Señora {st.session_state.saludo}!")
 st.write("### ¿Cómo se siente usted hoy?")
 
@@ -127,45 +119,39 @@ col3, col4 = st.columns(2)
 opcion = None
 
 with col1:
-    if st.button("😔 Triste"):
-        opcion = "Triste"
+    if st.button("😔 Triste"): opcion = "Triste"
 with col2:
-    if st.button("😐 Normal"):
-        opcion = "Normal"
+    if st.button("😐 Normal"): opcion = "Normal"
 with col3:
-    if st.button("😊 Feliz"):
-        opcion = "Feliz"
+    if st.button("😊 Feliz"): opcion = "Feliz"
 with col4:
-    if st.button("🚀 ¡Súper!"):
-        opcion = "Súper Feliz"
+    if st.button("🚀 ¡Súper!"): opcion = "Súper"
 
 st.write("---")
 
 if opcion:
     chiste = random.choice(lista_chistes)
     foto = random.choice(fotos_galeria)
-
+    
     if opcion == "Triste":
         st.write("### Mi niñita, un chiste fome para alegrar el día:")
         st.info(chiste)
-        st.image(foto, use_container_width=True)
     elif opcion == "Normal":
         st.write("### ¡Disfrute su día! Aquí uno quizás no tan fome:")
         st.info(chiste)
-        st.image(foto, use_container_width=True)
-    elif opcion == "Feliz" or opcion == "Súper Feliz":
-        st.write(f"### ¡Esa es mi hija! {'¡CELEBRACIÓN TOTAL!' if opcion == 'Súper Feliz' else ''}")
+    else:
+        st.write("### ¡Esa es mi hija! ¡A celebrar!")
         st.balloons()
-        if opcion == "Súper Feliz": st.snow()
         st.info(chiste)
-        st.image(foto, use_container_width=True)
+    
+    st.image(foto, use_container_width=True)
 
 st.write("---")
+# BOTÓN FINAL SIN SUBRAYAR Y EN MAYÚSCULAS
 st.markdown(f"""
     <div style="text-align: center;">
-        <a href="https://wa.me/56992238085" class="whatsapp-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="20">
-            ENVIARLE UN MENSAJE A PAPÁ
+        <a href="https://wa.me/56992238085" class="papi-btn">
+            MENSAJE A PAPI
         </a>
     </div>
 """, unsafe_allow_html=True)
