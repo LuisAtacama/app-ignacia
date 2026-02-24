@@ -11,13 +11,20 @@ st.markdown("""
     .stApp { background-color: #FFFFFF; }
     .main .block-container { background-color: #FFFFFF; padding: 40px !important; max-width: 600px; font-family: 'Inter', sans-serif; }
     h1, h2, h3 { color: #1A1A1A !important; text-align: center; }
-    .frase-papi-final { text-align: center; font-style: italic; font-size: 20px; color: #1A1A1A; margin-top: 15px; font-weight: 400; }
     .chiste-box { background-color: #F8F9FA; border-radius: 15px; padding: 25px; text-align: center; font-size: 18px; color: #1A1A1A; margin: 20px 0; border: 1px solid #EEE; line-height: 1.6; white-space: pre-wrap; }
     .whatsapp-btn { background-color: #25D366; color: white !important; padding: 16px 32px; border-radius: 50px; text-decoration: none !important; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.1); }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. LISTA DE FOTOS (SOLO URLS, SIN TEXTOS ADJUNTO) ---
+# --- 2. LISTADO DE PALABRAS PARA EL SALUDO DINÁMICO ---
+palabras = [
+    "Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", 
+    "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", 
+    "Cuadernita", "Matemáticas", "De La Lota", "Monopoly", "Pepinosky", 
+    "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"
+]
+
+# --- 3. LISTA DE FOTOS ---
 urls_fotos = [
     "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg",
     "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg",
@@ -46,7 +53,7 @@ urls_fotos = [
     "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
 ]
 
-# --- 3. SUS CHISTES REALES (LOS QUE USTED PASÓ) ---
+# --- 4. SUS CHISTES REALES ---
 chistes_reales = [
     "— En Hawai uno no se hospeda, se aloha.",
     "— ¿Cómo se llama el campeón japonés de buceo? \n — Tokofondo. \n — ¿Y el segundo lugar? \n — Kasitoko.",
@@ -76,10 +83,13 @@ chistes_reales = [
     "— ¿Cuántos pelos tiene la cola de un caballo? \n — 30.583. \n — ¿Y cómo lo sabes? \n — Perdone profesor… pero esa ya es otra pregunta."
 ]
 
-# --- 4. ESTRUCTURA APP ---
-st.title("❤️ Hola, Ignacita linda")
+# --- 5. ESTRUCTURA APP ---
 
-# SECCIÓN FOTOS
+# SALUDO DINÁMICO (Cambia cada vez que se recarga la app)
+saludo_aleatorio = random.choice(palabras)
+st.title(f"❤️ Hola, Ignacita {saludo_aleatorio}")
+
+# SECCIÓN RECUERDOS
 st.write("### 📸 Un recuerdo para hoy")
 animo = st.select_slider(label="¿Cómo se siente?", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
 
@@ -88,9 +98,8 @@ st.divider()
 if animo != "Seleccione":
     foto_elegida = random.choice(urls_fotos)
     st.image(foto_elegida, use_container_width=True)
-    # Solo mostramos su frase de amor general debajo de la foto
-    st.markdown('<p class="frase-papi-final">"La amo mucho siempre, hijita linda"</p>', unsafe_allow_html=True)
-    if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
+    if animo in ["FELIZ", "MUY FELIZ"]: 
+        st.balloons()
 else:
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
 
