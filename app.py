@@ -4,82 +4,46 @@ import random
 # 1. CONFIGURACIÓN
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO CSS (BLANCO TOTAL) ---
+# --- DISEÑO ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
     .stApp { background-color: #FFFFFF; }
-    .main .block-container {
-        background-color: #FFFFFF;
-        padding: 40px !important;
-        font-family: 'Inter', sans-serif;
-        max-width: 600px;
-    }
-    h1, h2, h3, p, label { color: #1A1A1A !important; text-align: center; }
+    .main .block-container { background-color: #FFFFFF; padding: 40px !important; max-width: 600px; }
+    h1, h3, p { color: #1A1A1A !important; text-align: center; font-family: 'Inter', sans-serif; }
     .stInfo { 
-        background-color: #F8F9FA !important; 
-        border-radius: 20px; border: 1px solid #EEE;
-        color: #1A1A1A !important; padding: 25px !important;
-        font-size: 18px; line-height: 1.6;
+        background-color: #F8F9FA !important; border-radius: 20px; border: 1px solid #EEE;
+        color: #1A1A1A !important; padding: 25px !important; font-size: 18px;
     }
-    .whatsapp-container { text-align: center; margin-top: 40px; }
     .whatsapp-btn {
         background-color: #25D366; color: white !important; padding: 14px 28px;
-        border-radius: 50px; text-decoration: none !important; font-weight: 700;
-        display: inline-flex; align-items: center; gap: 10px;
+        border-radius: 50px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 10px;
     }
-    .stTextInput > div > div > input { border-radius: 25px; border: 1px solid #DDD; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. EL CEREBRO DE PAPI (ADN LUIS) ---
-def obtener_respuesta_papa(texto):
+# --- 2. EL NUEVO MOTOR DE RESPUESTA (ADN LUIS) ---
+def responder_como_papi_real(texto):
     texto = texto.lower()
     
-    # Base de datos de respuestas variadas según su chat real
-    respuestas = {
-        "pena": [
-            "Está bien ponerse triste hijita linda, eso es parte de la vida. No se guarde nada, ponga fuera lo que siente. No hay nada que cambiar en usted, es increíble tal como es.",
-            "Pucha mi niñita, me da pena que esté así. Pero aquí estamos para apoyarla siempre. Respire profundo... le mando un abrazo hijita linda.",
-            "A veces el corazón necesita soltar un poquito de lluvia. Mañana será un mejor día, ya verá. La amo mucho siempre."
-        ],
-        "logros": [
-            "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó de vivaldi!",
-            "¡Excelente! Usted es una niña muy inteligente y valiente. ¡Qué buena noticia me da!",
-            "Saca muy buenas fotos y hace cosas preciosas, se pasó hijita. ¡Usted es una artista!"
-        ],
-        "colegio": [
-            "Ok hijita, vamos por partes. No se abrume por las tareas. Si algo está difícil, lo revisamos juntos. Hay que tener paciencia pero lo vamos a lograr.",
-            "Usted es súper capaz e inteligente. No se castigue si algo no sale a la primera, lo importante es el esfuerzo que pone siempre."
-        ],
-        "amor": [
-            "Ay mi niñita, los temas del corazón son enredados. Lo más importante es que aprenda a escucharse y a quererse mucho usted primero. Le mando un abrazo hijita linda.",
-            "Dése tiempo, no se apure con esas cosas. Su felicidad y que se sienta bien es lo que más me importa a mí."
-        ],
-        "distancia": [
-            "Yo también la extraño mucho, mi chiquitita linda. Me encantaría estar ahí con usted ahora, pero sepa que mi corazón está al ladito suyo siempre. Le mando un abrazo hijita linda.",
-            "Aunque no esté ahí físicamente, sepa que cuenta conmigo para todo. No está sola nunca."
-        ]
-    }
+    # Fragmentos de su voz real (extraídos de su chat y perfil)
+    validaciones = ["Está bien sentirse así mi chiquitita.", "Pucha mi niñita, la entiendo.", "No hay nada que cambiar en usted, es increíble tal como es.", "Usted es una niña muy inteligente, alegre y valiente."]
+    consejos = ["Hay que ser vivaldi y tener paciencia.", "Vamos por partes, ¿ya? Así lo ordenamos.", "Recuerde que una amiga de verdad no la obliga a nada.", "Usted tiene muy buen gusto, confíe en eso."]
+    cierres = ["La amo mucho siempre, hijita linda.", "Aquí estoy para escucharla siempre.", "Le mando un abrazo apretado a la distancia."]
 
-    # Lógica de detección
-    if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "asusto", "pucha"]):
-        return random.choice(respuestas["pena"])
-        
-    if any(k in texto for k in ["gane", "bien", "logre", "mira", "foto", "dibujo", "pinte", "nota"]):
-        return random.choice(respuestas["logros"])
-
-    if any(k in texto for k in ["colegio", "tarea", "prueba", "clase", "profe"]):
-        return random.choice(respuestas["colegio"])
-
-    if any(k in texto for k in ["gustar", "corazon", "enamorada", "alguien", "niño", "niña"]):
-        return random.choice(respuestas["amor"])
-
-    if any(k in texto for k in ["extraño", "papi", "verte", "donde", "te quiero"]):
-        return random.choice(respuestas["distancia"])
-
-    return ("Mi niñita linda, cuénteme más. Usted sabe que siempre voy a estar atento a lo que necesite y "
-            "aquí estoy para escucharla. La amo mucho siempre.")
+    # Lógica de construcción de frase (más natural)
+    if any(k in texto for k in ["triste", "pena", "mal", "miedo"]):
+        msg = f"{random.choice(validaciones)} {random.choice(cierres)}"
+    elif any(k in texto for k in ["gustar", "alguien", "niño", "corazon"]):
+        msg = "Ay mi niñita, los temas del corazón son enredados. Lo más importante es que aprenda a escucharse y a quererse mucho usted primero. Le mando un abrazo hijita linda."
+    elif any(k in texto for k in ["colegio", "tarea", "prueba"]):
+        msg = f"Ok hijita, vamos por partes. No se abrume. {random.choice(consejos)} {random.choice(cierres)}"
+    elif any(k in texto for k in ["gane", "mira", "bien", "foto"]):
+        msg = f"¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó! {random.choice(cierres)}"
+    else:
+        msg = f"Mi niñita linda, cuénteme más. Aquí estoy atento a lo que necesite. {random.choice(cierres)}"
+    
+    return msg
 
 # --- 3. BANCO DE FOTOS ---
 fotos_galeria = [
@@ -113,30 +77,19 @@ fotos_galeria = [
 # --- 4. INTERFAZ ---
 st.title("❤️ App de Ignacia")
 
-# CHAT
 st.write("### 💬 Pregúntele a Papi")
-pregunta = st.text_input("Escríbame algo, mi niñita...", key="chat_input")
+pregunta = st.text_input("Cuénteme algo, mi niñita...", key="chat_input")
 if pregunta:
-    st.info(f"👨‍👧 **Papi dice:** {obtener_respuesta_papa(pregunta)}")
+    st.info(f"👨‍👧 **Papi dice:** {responder_como_papi_real(pregunta)}")
 
 st.divider()
 
-# ÁNIMO
-st.write("### 😊 ¿Cómo se siente usted hoy?")
+st.write("### 😊 ¿Cómo se siente hoy?")
 animo = st.select_slider(label="Estado:", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
 
 if animo != "Seleccione":
-    foto_rnd = random.choice(fotos_galeria)
-    st.image(foto_rnd, use_container_width=True)
-    st.markdown("<p style='text-align:center; font-style:italic; font-size:18px;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
-    if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
+    foto = random.choice(fotos_galeria)
+    st.image(foto, use_container_width=True)
+    st.markdown("<p style='font-style:italic;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
 
-# WHATSAPP
-st.markdown(f"""
-    <div class="whatsapp-container">
-        <a href="https://wa.me/56992238085" class="whatsapp-btn">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="24">
-            MENSAJE A PAPI
-        </a>
-    </div>
-""", unsafe_allow_html=True)
+st.markdown("""<div style='text-align:center; margin-top:40px;'><a href='https://wa.me/56992238085' class='whatsapp-btn'><img src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' width='24'> MENSAJE A PAPI</a></div>""", unsafe_allow_html=True)
