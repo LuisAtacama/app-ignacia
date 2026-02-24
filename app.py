@@ -4,7 +4,7 @@ import random
 # 1. CONFIGURACIÓN DE PÁGINA
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO CSS (BLANCO PULCRO Y TIPOGRAFÍA INTER) ---
+# --- DISEÑO CSS (BLANCO PULCRO) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -32,36 +32,41 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. EL CEREBRO DE PAPI (ADN REAL DE LUIS) ---
+# --- 2. EL CEREBRO DE PAPI (ADN DE LUIS) ---
 def obtener_respuesta_papa(texto):
     texto = texto.lower()
+    abrazo = " Le mando un abrazo hijita linda."
     
-    # Categorías basadas en su estilo real del chat
-    if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "asusto"]):
-        return ("Está bien ponerse triste mi chiquitita, y asustarse también, eso es normal. No se guarde eso. "
-                "Desde acá le envío un abrazito apretado y mucha fuerza. No hay nada que cambiar en usted, "
-                "es increíble tal como es. ¿Me quiere contar un poquito más?")
+    # 1. TRISTEZA O MIEDO (Aquí SIEMPRE va el abrazo)
+    if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "asusto", "pucha"]):
+        return ("Está bien ponerse así mi chiquitita, es normal. No se guarde nada. "
+                "Desde acá la acompaño con todo mi corazón y no hay nada que cambiar en usted, "
+                "es increíble tal como es." + abrazo)
         
+    # 2. TEMAS DEL CORAZÓN (Abrazo necesario por contención)
     if any(k in texto for k in ["gustar", "niño", "niña", "corazon", "enamorada", "alguien"]):
-        return ("Ay mi niñita, los temas del corazón a veces son enredados. Lo más importante es que aprenda a "
-                "escuchar su cuerpo y a cuidarse con mucho cariño, sin culparse por lo que siente. "
-                "Dése tiempo, que su felicidad es lo primero para mí. La abrazo a la distancia.")
+        return ("Ay mi niñita, los temas del corazón son enredados. Lo más importante es que aprenda a "
+                "escuchar su cuerpo y a cuidarse con mucho cariño. Su felicidad es lo primero para mí." + abrazo)
 
+    # 3. COLEGIO (Abrazo opcional/aleatorio)
     if any(k in texto for k in ["colegio", "tarea", "prueba", "nota", "clase", "profe"]):
-        return ("Ok hijita, vamos por partes. No se abrume, que usted es muy inteligente y habilosa. "
-                "Si algo está difícil, me cuenta y lo ordenamos juntos. Pucha, hay que tener paciencia "
-                "pero lo vamos a lograr, ¡acuérdese que usted puede con todo!")
+        res = ("Ok hijita, vamos por partes. No se abrume, que usted es muy inteligente y habilosa. "
+               "Pucha, hay que tener paciencia pero lo vamos a lograr entre los dos.")
+        return res + abrazo if random.random() > 0.5 else res
 
+    # 4. EXTRAÑAR (Aquí SIEMPRE va el abrazo)
     if any(k in texto for k in ["extraño", "papi", "verte", "donde", "te quiero"]):
-        return ("¡Yo también la extraño mucho, hijita linda! Me encantaría estar ahí para darle un abrazo de oso, "
-                "pero se lo envío por aquí con todo mi amor. Recuerde que mi corazón está al ladito suyo todo el día.")
+        return ("¡Yo también la extraño mucho, hijita linda! Me encantaría estar ahí, "
+                "pero le envío todo mi amor por aquí. Mi corazón está al ladito suyo siempre." + abrazo)
 
+    # 5. LOGROS (Aquí no va el abrazo, va CELEBRACIÓN)
     if any(k in texto for k in ["gane", "bien", "logre", "mira", "foto", "dibujo", "pinte"]):
         return ("¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó! "
                 "Tiene un gusto excelente para todo lo que hace, mi artista favorita.")
 
-    return ("Mi niñita linda, cuénteme más. Usted sabe que puede contarme lo que sea y yo siempre voy a estar atento. "
-            "Aquí estoy para escucharla siempre.")
+    # 6. RESPUESTA POR DEFECTO (Aleatorio)
+    res_def = "Mi niñita linda, cuénteme más. Usted sabe que siempre voy a estar atento a lo que necesite."
+    return res_def + abrazo if random.random() > 0.7 else res_def
 
 # --- 3. BANCO DE FOTOS ---
 fotos_galeria = [
@@ -113,7 +118,7 @@ if animo != "Seleccione":
     st.markdown("<p style='text-align:center; font-style:italic; font-size:18px;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
     if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
 
-# BOTÓN WHATSAPP FINAL
+# BOTÓN WHATSAPP
 st.markdown(f"""
     <div class="whatsapp-container">
         <a href="https://wa.me/56992238085" class="whatsapp-btn">
