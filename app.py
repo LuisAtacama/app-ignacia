@@ -71,7 +71,7 @@ else:
         st.session_state.chistes_vistos.append(chiste_del_momento)
 
     if animo == "Triste":
-        st.write("### Mi niñita, un chiste fome para alegrar el dia. Mire:")
+        st.write("### Mi niñita, un chiste fome para alegrar el día. Mire:")
         st.info(chiste_del_momento)
         st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg")
 
