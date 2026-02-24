@@ -16,7 +16,7 @@ palabra_del_dia = random.choice(palabras)
 # --- INICIO: SALUDO DINÁMICO ---
 st.title(f"❤️ ¡Hola, mi Señora {palabra_del_dia}!")
 
-st.subheader("💬 ¿Cómo te sientes hoy?")
+st.subheader("💬 ¿Cómo se siente hoy?")
 animo = st.select_slider(
     "Mueve la barrita para que papá te responda:",
     options=["Selecciona", "Triste", "Normal", "Feliz", "¡Súper Feliz!"]
