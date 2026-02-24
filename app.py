@@ -1,10 +1,10 @@
 import streamlit as st
 import random
 
-# 1. CONFIGURACIÓN
+# 1. CONFIGURACIÓN DE PÁGINA
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
 
-# --- DISEÑO CSS (BLANCO PLANO Y MODERNO) ---
+# --- DISEÑO CSS (BLANCO PULCRO Y TIPOGRAFÍA INTER) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
@@ -17,56 +17,51 @@ st.markdown("""
     }
     h1, h2, h3, p, label { color: #1A1A1A !important; text-align: center; }
     .stInfo { 
-        background-color: #F0F2F6 !important; 
-        border-radius: 20px; 
-        border: none; 
-        color: #1A1A1A !important; 
-        padding: 20px !important;
-        font-size: 18px;
+        background-color: #F8F9FA !important; 
+        border-radius: 20px; border: 1px solid #EEE;
+        color: #1A1A1A !important; padding: 25px !important;
+        font-size: 18px; line-height: 1.6;
     }
     .whatsapp-container { text-align: center; margin-top: 40px; }
     .whatsapp-btn {
         background-color: #25D366; color: white !important; padding: 14px 28px;
         border-radius: 50px; text-decoration: none !important; font-weight: 700;
-        display: inline-flex; align-items: center; gap: 10px;
+        display: inline-flex; align-items: center; gap: 10px; font-size: 16px;
     }
-    .stTextInput > div > div > input { border-radius: 25px; }
+    .stTextInput > div > div > input { border-radius: 25px; border: 1px solid #DDD; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. EL CEREBRO DE PAPI (CON SU FRASE DE CIERRE) ---
-FRASE_CIERRE = "La amo mucho siempre, hijita linda."
-
-respuestas_chat = {
-    "tristeza": "Está bien ponerse triste mi chiquitita. Desde acá le envío un abrazito apretado y mucha fuerza.",
-    "colegio": "Ok hijita, vamos por partes. Cuénteme qué pasó y lo solucionamos juntos. Usted es muy inteligente.",
-    "amigas": "Recuerde que una amiga de verdad no la obliga a nada. Usted sea siempre fiel a lo que siente.",
-    "orgullo": "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del mundo. ¡Se pasó!",
-    "te_extrano": "Yo también la extraño mucho, mi niñita. Le mando el abrazo más grande del mundo hasta allá.",
-    "arte": "¡Qué buen gusto tiene, hijita! Saca fotos y hace cosas preciosas, es una artista.",
-    "fallback": "Mi niñita, cuénteme más. Aquí estoy para escucharla y acompañarla en todo."
-}
-
-def obtener_respuesta(texto):
+# --- 2. EL CEREBRO DE PAPI (ADN REAL DE LUIS) ---
+def obtener_respuesta_papa(texto):
     texto = texto.lower()
-    keywords = {
-        "tristeza": ["triste", "pena", "mal", "pucha", "llorar"],
-        "colegio": ["colegio", "tarea", "clase", "prueba", "estudiar"],
-        "amigas": ["amiga", "pelea", "niñas", "dijo"],
-        "orgullo": ["gane", "nota", "bien", "logre", "pude"],
-        "te_extrano": ["extraño", "papi", "donde", "te quiero"],
-        "arte": ["foto", "dibujo", "pintar", "musica"]
-    }
     
-    # Buscar coincidencia
-    respuesta_base = respuestas_chat["fallback"]
-    for intent, keys in keywords.items():
-        if any(k in texto for k in keys):
-            respuesta_base = respuestas_chat[intent]
-            break
-            
-    # Retornar respuesta combinada con su frase de oro
-    return f"{respuesta_base} {FRASE_CIERRE}"
+    # Categorías basadas en su estilo real del chat
+    if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "asusto"]):
+        return ("Está bien ponerse triste mi chiquitita, y asustarse también, eso es normal. No se guarde eso. "
+                "Desde acá le envío un abrazito apretado y mucha fuerza. No hay nada que cambiar en usted, "
+                "es increíble tal como es. ¿Me quiere contar un poquito más?")
+        
+    if any(k in texto for k in ["gustar", "niño", "niña", "corazon", "enamorada", "alguien"]):
+        return ("Ay mi niñita, los temas del corazón a veces son enredados. Lo más importante es que aprenda a "
+                "escuchar su cuerpo y a cuidarse con mucho cariño, sin culparse por lo que siente. "
+                "Dése tiempo, que su felicidad es lo primero para mí. La abrazo a la distancia.")
+
+    if any(k in texto for k in ["colegio", "tarea", "prueba", "nota", "clase", "profe"]):
+        return ("Ok hijita, vamos por partes. No se abrume, que usted es muy inteligente y habilosa. "
+                "Si algo está difícil, me cuenta y lo ordenamos juntos. Pucha, hay que tener paciencia "
+                "pero lo vamos a lograr, ¡acuérdese que usted puede con todo!")
+
+    if any(k in texto for k in ["extraño", "papi", "verte", "donde", "te quiero"]):
+        return ("¡Yo también la extraño mucho, hijita linda! Me encantaría estar ahí para darle un abrazo de oso, "
+                "pero se lo envío por aquí con todo mi amor. Recuerde que mi corazón está al ladito suyo todo el día.")
+
+    if any(k in texto for k in ["gane", "bien", "logre", "mira", "foto", "dibujo", "pinte"]):
+        return ("¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó! "
+                "Tiene un gusto excelente para todo lo que hace, mi artista favorita.")
+
+    return ("Mi niñita linda, cuénteme más. Usted sabe que puede contarme lo que sea y yo siempre voy a estar atento. "
+            "Aquí estoy para escucharla siempre.")
 
 # --- 3. BANCO DE FOTOS ---
 fotos_galeria = [
@@ -102,23 +97,23 @@ st.title("❤️ App de Ignacia")
 
 # CHAT
 st.write("### 💬 Pregúntele a Papi")
-pregunta = st.text_input("Cuénteme algo, mi niñita...", key="chat_input")
+pregunta = st.text_input("Escríbame algo, mi niñita...", key="chat_input")
 if pregunta:
-    st.info(f"👨‍👧 **Papi dice:** {obtener_respuesta(pregunta)}")
+    st.info(f"👨‍👧 **Papi dice:** {obtener_respuesta_papa(pregunta)}")
 
 st.divider()
 
-# ÁNIMO Y FOTOS
+# ÁNIMO
 st.write("### 😊 ¿Cómo se siente usted hoy?")
 animo = st.select_slider(label="Estado:", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
 
 if animo != "Seleccione":
     foto_rnd = random.choice(fotos_galeria)
     st.image(foto_rnd, use_container_width=True)
-    st.markdown(f"<p style='text-align:center; font-style:italic; font-size:18px;'>\"{FRASE_CIERRE}\"</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align:center; font-style:italic; font-size:18px;'>\"La amo mucho siempre, hijita linda.\"</p>", unsafe_allow_html=True)
     if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
 
-# WHATSAPP
+# BOTÓN WHATSAPP FINAL
 st.markdown(f"""
     <div class="whatsapp-container">
         <a href="https://wa.me/56992238085" class="whatsapp-btn">
