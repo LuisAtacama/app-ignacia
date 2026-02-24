@@ -4,46 +4,45 @@ st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
 
 st.title("❤️ ¡Bienvenida, mi Señora Matemáticas!")
 
-# --- SECCIÓN DE ÁNIMO (LA LLAVE MAESTRA) ---
-st.subheader("💬 ¿Cómo te sientes en este momento?")
+# --- SECCIÓN DE ÁNIMO ---
+st.subheader("💬 ¿Cómo te sientes hoy, hija?")
 animo = st.select_slider(
-    "Mueve la barrita para recibir tu sorpresa:",
+    "Mueve la barrita para ver tu sorpresa:",
     options=["Triste", "Normal", "Feliz", "¡Súper Feliz!"]
 )
 
 st.write("---")
 
-# --- RESPUESTA DINÁMICA ---
+# --- RESPUESTA DINÁMICA CON VIDEOS DE DRIVE ---
 
-if animo == "Triste":
-    st.subheader("🧸 Un abrazo para el alma")
-    st.write("Hija, cuando estés triste, recuerda que siempre estaré para ti. Mira este video:")
-    # Puedes poner un video de YouTube tierno o una canción
-    st.video("https://www.youtube.com/watch?v=dQw4w9WgXcQ") 
-    st.info("¡Arriba ese ánimo! Eres la niña más fuerte que conozco.")
+if animo == "Triste" or animo == "Normal":
+    st.subheader("🐶 ¡Un regalito para que sonrías!")
+    st.write("Mira este video que te preparé:")
+    # Video del perrito/mascota
+    st.video("https://drive.google.com/uc?export=download&id=1CpEGP3sQrKJuPPaX823rf72g9Pyp0PnX")
+    st.info("¡Papá siempre está aquí para hacerte reír!")
 
-elif animo == "Normal":
-    st.subheader("📸 Un recuerdo para tu día")
-    st.write("¡Qué bueno que tengas un día tranquilo! Mira esta foto de nuestro tesoro:")
-    st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", caption="¡Tú y yo siempre!")
-    st.write("Espero que este recuerdo te saque una sonrisa.")
+elif animo == "Feliz" or animo == "¡Súper Feliz!":
+    st.subheader("💃 ¡Ese es el ánimo!")
+    st.write("¡Me encanta verte así de contenta! Mira:")
+    # Video de ella bailando/feliz
+    st.video("https://drive.google.com/uc?export=download&id=1FtAyAEg5zW6D8qm46Fh1N-RXOSrJyir_")
+    st.balloons()
+    if animo == "¡Súper Feliz!":
+        st.snow()
+        st.success("¡Eres la mejor, Ignacia! Que nada te quite esa sonrisa.")
 
-elif animo == "Feliz":
-    st.subheader("🌟 ¡Que nada te detenga!")
-    st.write("¡Me encanta que estés feliz! Eres luz pura. Mira lo que tengo para ti:")
-    st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg", caption="¡Esa alegría es contagiosa!")
-    st.balloons() # Lluvia de globos
-
-elif animo == "¡Súper Feliz!":
-    st.subheader("🥳 ¡FIESTA TOTAL!")
-    st.write("¡ESTO HAY QUE CELEBRARLO! Eres la mejor, mi Señora Matemáticas.")
-    # Aquí puedes poner un video de una canción alegre
-    st.video("https://www.youtube.com/watch?v=y6120QOlsfU")
-    st.balloons() # ¡Muchos globos!
-    st.snow()     # ¡Y nieve también para celebrar!
+# --- SECCIÓN DE FOTOS (Las que ya teníamos) ---
+st.write("---")
+st.subheader("📸 Nuestros Recuerdos")
+col1, col2 = st.columns(2)
+with col1:
+    st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", caption="¡Amor infinito!")
+with col2:
+    st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg", caption="Tu alegría")
 
 st.write("---")
-# No olvides poner tu número real aquí:
-st.link_button("💌 CUÉNTAME MÁS POR WHATSAPP", "https://wa.me/56992238085")
+# RECUERDA: Pon tu número de WhatsApp real aquí
+st.link_button("💌 MANDARLE UN MENSAJE A PAPÁ", "https://wa.me/569XXXXXXXX")
 
-st.caption("Tu app se actualiza según tu corazón. ❤️")
+st.caption("Hecho con ❤️ por tu papá.")
