@@ -12,6 +12,7 @@ st.markdown("""
     .main .block-container { background-color: #FFFFFF; padding: 40px !important; max-width: 600px; font-family: 'Inter', sans-serif; }
     h1 { color: #1A1A1A !important; text-align: center; font-weight: 700; }
     h3 { color: #4A4A4A !important; text-align: center; }
+    .mensaje-animo { text-align: center; font-size: 20px; color: #1A1A1A; font-style: italic; margin-top: 20px; padding: 10px; border-top: 1px solid #EEE; }
     .chiste-box { background-color: #F8F9FA; border-radius: 15px; padding: 25px; text-align: center; font-size: 18px; color: #1A1A1A; margin: 20px 0; border: 1px solid #EEE; line-height: 1.6; white-space: pre-wrap; }
     .whatsapp-btn { background-color: #25D366; color: white !important; padding: 16px 32px; border-radius: 50px; text-decoration: none !important; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.1); }
     </style>
@@ -58,29 +59,60 @@ urls_fotos = [
     "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
 ]
 
-# --- 5. BANCO DE CHISTES (NUEVA LISTA DE IMAGEN) ---
+# --- 5. BANCO DE CHISTES (SIN NÚMEROS) ---
 chistes_reales = [
-    "1. — En Hawai uno no se hospeda, se aloha.",
-    "2. — ¿Cómo se llama el campeón japonés de buceo?\n— Tokofondo.\n— ¿Y el segundo lugar?\n— Kasitoko.",
-    "3. — Ayer pasé por tu casa y me tiraste una palta… qué palta de respeto.",
-    "4. — Robinson Crusoe y lo atropellaron.",
-    "5. — El otro día vi a un otaku triste y lo animé.",
-    "6. — Ayer metí un libro de récords en la batidora y batí todos los récords.",
-    "7. — ¿Qué le dice un pan a otro pan?\n— Te presento una miga.",
-    "8. — Cuando estés triste abraza un zapato.\n— Un zapato consuela.",
-    "9. — Doctor, doctor, tengo un hueso afuera.\n— ¡Hágalo pasar!",
-    "10. — Una señora llorando llega a una zapatería:\n— ¿Tiene zapatos de cocodrilo?\n— ¿Qué número calza su cocodrilo?",
-    "11. — Un tipo va al oculista.\n— Mire la pared.\n— ¿Cuál pared?",
-    "12. — Un español le pregunta a un inglés:\n— ¿Cómo llaman a los bomberos?\n— Firemen.\n— Nosotros los llamamos por teléfono.",
-    "13. — ¿Te sabes el chiste del tarro?\n— No.\n— ¡Qué lata!",
-    "14. — Tengo un perro que dice “Hola”.\n— En mi casa tengo un tarro que dice “Nescafé”.",
-    "15. — ¿Aló, está Joaco?\n— No, Joaco mprar.",
-    "16. — ¿Qué le dijo un techo a otro techo?\n— Techo de menos.",
-    "17. — ¿Qué hace una abeja en el gimnasio?\n— Zum-ba.",
-    "18. — Te haré una última pregunta. Si la sabes, te apruebo.\n¿Cuántos pelos tiene la cola de un caballo?\n— 30.583.\n— ¿Y cómo lo sabes?\n— Perdone profesor… pero esa ya es otra pregunta."
+    "— En Hawai uno no se hospeda, se aloha.",
+    "— ¿Cómo se llama el campeón japonés de buceo?\n— Tokofondo.\n— ¿Y el segundo lugar?\n— Kasitoko.",
+    "— Ayer pasé por tu casa y me tiraste una palta… qué palta de respeto.",
+    "— Robinson Crusoe y lo atropellaron.",
+    "— El otro día vi a un otaku triste y lo animé.",
+    "— Ayer metí un libro de récords en la batidora y batí todos los récords.",
+    "— ¿Qué le dice un pan a otro pan?\n— Te presento una miga.",
+    "— Cuando estés triste abraza un zapato.\n— Un zapato consuela.",
+    "— Doctor, doctor, tengo un hueso afuera.\n— ¡Hágalo pasar!",
+    "— Una señora llorando llega a una zapatería:\n— ¿Tiene zapatos de cocodrilo?\n— ¿Qué número calza su cocodrilo?",
+    "— Un tipo va al oculista.\n— Mire la pared.\n— ¿Cuál pared?",
+    "— Un español le pregunta a un inglés:\n— ¿Cómo llaman a los bomberos?\n— Firemen.\n— Nosotros los llamamos por teléfono.",
+    "— ¿Te sabes el chiste del tarro?\n— No.\n— ¡Qué lata!",
+    "— Tengo un perro que dice “Hola”.\n— En mi casa tengo un tarro que dice “Nescafé”.",
+    "— ¿Aló, está Joaco?\n— No, Joaco mprar.",
+    "— ¿Qué le dijo un techo a otro techo?\n— Techo de menos.",
+    "— ¿Qué hace una abeja en el gimnasio?\n— Zum-ba.",
+    "— Te haré una última pregunta. Si la sabes, te apruebo.\n¿Cuántos pelos tiene la cola de un caballo?\n— 30.583.\n— ¿Y cómo lo sabes?\n— Perdone profesor… pero esa ya es otra pregunta."
 ]
 
-# --- 6. CUERPO DE LA APP ---
+# --- 6. MOTOR DE RESPUESTA POR ÁNIMO ---
+def obtener_mensaje_papi(estado):
+    opciones = {
+        "MUY TRISTE": [
+            "Pucha mi chiquitita, una respiración profunda y acuérdese que papi la ama mucho.",
+            "Ya po mi niñita, cuénteme qué pasó. Aquí estoy al ladito suyo en el corazón.",
+            "No hay nada que cambiar en usted, es perfecta. Vamos, arriba el ánimo que usted es valiente."
+        ],
+        "TRISTE": [
+            "Pucha, estemos Vivaldi po. No deje que nada le quite esa luz que tiene.",
+            "Le mando un abrazo apretado. Usted es súper inteligente y va a poder con todo.",
+            "¿Qué pasó mi niñita? Cuénteme por WhatsApp para entenderla bien."
+        ],
+        "NORMAL": [
+            "¡Esa es la actitud! en calma y Vivaldi con sus cosas.",
+            "Qué bueno verla bien, mi chiquitita. Siga así de enfocada.",
+            "¡Aaaa que bien! Un día normal pero siempre especial porque usted es única."
+        ],
+        "FELIZ": [
+            "¡Aaaa que me pone feliz verla así! Se pasó de Vivaldi.",
+            "¡Esa es mi niñita! Me hace sentir el papá más orgulloso del universo.",
+            "¡Excelente mi niñita! Disfrute mucho su alegría hoy."
+        ],
+        "MUY FELIZ": [
+            "¡Se pasó! Me explota el corazón de alegría al verla tan contenta.",
+            "¡Usted es una artista de la felicidad! Siga brillando así de lindo.",
+            "¡Aaaaa que biennn! Disfrute al máximo, mi señora inteligente."
+        ]
+    }
+    return random.choice(opciones.get(estado, ["Hola mi niñita linda."]))
+
+# --- 7. CUERPO DE LA APP ---
 st.write("### 📸 Un recuerdo para hoy")
 animo = st.select_slider(label="¿Cómo se siente?", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
 
@@ -89,6 +121,11 @@ st.divider()
 if animo != "Seleccione":
     foto_elegida = random.choice(urls_fotos)
     st.image(foto_elegida, use_container_width=True)
+    
+    # MENSAJE DINÁMICO DE PAPI
+    mensaje = obtener_mensaje_papi(animo)
+    st.markdown(f'<div class="mensaje-animo">{mensaje}</div>', unsafe_allow_html=True)
+    
     if animo in ["FELIZ", "MUY FELIZ"]: 
         st.balloons()
 else:
