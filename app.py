@@ -10,13 +10,14 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
     .stApp { background-color: #FFFFFF; }
     .main .block-container { background-color: #FFFFFF; padding: 40px !important; max-width: 600px; font-family: 'Inter', sans-serif; }
-    h1, h2, h3 { color: #1A1A1A !important; text-align: center; }
+    h1 { color: #1A1A1A !important; text-align: center; font-weight: 700; }
+    h3 { color: #4A4A4A !important; text-align: center; }
     .chiste-box { background-color: #F8F9FA; border-radius: 15px; padding: 25px; text-align: center; font-size: 18px; color: #1A1A1A; margin: 20px 0; border: 1px solid #EEE; line-height: 1.6; white-space: pre-wrap; }
     .whatsapp-btn { background-color: #25D366; color: white !important; padding: 16px 32px; border-radius: 50px; text-decoration: none !important; font-weight: 700; display: inline-flex; align-items: center; gap: 12px; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.1); }
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. LISTADO DE PALABRAS PARA EL SALUDO DINÁMICO ---
+# --- 2. LISTADO DE PALABRAS PERSONALIZADAS ---
 palabras = [
     "Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", 
     "Hermosita", "Chiquitita", "Loquita", "Molita", "Dinosauria", 
@@ -24,7 +25,11 @@ palabras = [
     "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"
 ]
 
-# --- 3. LISTA DE FOTOS ---
+# --- 3. INICIO: SALUDO DINÁMICO ---
+palabra_del_dia = random.choice(palabras)
+st.title(f"❤️ ¡Hola, mi Señora {palabra_del_dia}!")
+
+# --- 4. LISTA DE FOTOS ---
 urls_fotos = [
     "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg",
     "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg",
@@ -53,7 +58,7 @@ urls_fotos = [
     "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
 ]
 
-# --- 4. SUS CHISTES REALES ---
+# --- 5. SUS CHISTES REALES ---
 chistes_reales = [
     "— En Hawai uno no se hospeda, se aloha.",
     "— ¿Cómo se llama el campeón japonés de buceo? \n — Tokofondo. \n — ¿Y el segundo lugar? \n — Kasitoko.",
@@ -83,13 +88,7 @@ chistes_reales = [
     "— ¿Cuántos pelos tiene la cola de un caballo? \n — 30.583. \n — ¿Y cómo lo sabes? \n — Perdone profesor… pero esa ya es otra pregunta."
 ]
 
-# --- 5. ESTRUCTURA APP ---
-
-# SALUDO DINÁMICO (Cambia cada vez que se recarga la app)
-saludo_aleatorio = random.choice(palabras)
-st.title(f"❤️ Hola, Ignacita {saludo_aleatorio}")
-
-# SECCIÓN RECUERDOS
+# --- 6. CUERPO DE LA APP ---
 st.write("### 📸 Un recuerdo para hoy")
 animo = st.select_slider(label="¿Cómo se siente?", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
 
@@ -105,7 +104,6 @@ else:
 
 st.divider()
 
-# SECCIÓN CHISTES
 st.write("### 🤡 ¡Un chiste para alegrar el día!")
 if st.button("¡Cuéntame un chiste, Papi!"):
     chiste_hoy = random.choice(chistes_reales)
