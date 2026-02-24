@@ -22,56 +22,55 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- 2. MOTOR DE RESPUESTA ULTRA-VARIADO (ADN LUIS) ---
+# --- 2. MOTOR DE CONVERSACIÓN NO-REPETITIVO (ADN LUIS) ---
 def responder_como_papi(texto):
     texto = texto.lower()
     
-    # 1. Detección de Temas muy específicos para evitar repetición
-    # TEMA: SENTIMIENTOS / PENA
-    if any(k in texto for k in ["triste", "pena", "llorar", "bajoneada"]):
-        return random.choice([
-            "¿Pero hijita está bien?, ¿le pasó algo? Pucha más Vivaldi po mi niñita. Le mando un abrazo apretado.",
-            "Pucha mi chiquitita, cuénteme bien qué siente para que lo arreglemos. Le mando un abrazo apretado.",
-            "Está bien sentirse así a veces, no se guarde nada. Aquí estoy atento. Le mando un abrazo apretado."
-        ])
+    # Bloques de construcción según su estilo real
+    reacciones = ["¿Pero hijita está bien?", "Pucha mi niñita, ¿le pasó algo?", "¿Qué pasó mi chiquitita?", "Cuénteme bien el detalle para entenderla."]
+    instrucciones = ["Hay que estar Vivaldi po.", "Pucha hay que tener paciencia.", "Ya po, estemos Vivaldi con eso.", "Respire profundo, vamos por partes."]
+    afecto_triste = ["No hay nada que cambiar en usted, es increíble tal como es.", "Le mando un abrazo apretado.", "Aquí estoy atento a lo que necesite.", "La amo mucho siempre."]
+    
+    # 1. DETECCIÓN POR INTENSIÓN DINÁMICA
+    # PENA O PROBLEMAS
+    if any(k in texto for k in ["triste", "pena", "llorar", "mal", "miedo", "pucha", "asunto", "asusto"]):
+        # Mezclamos los bloques de forma distinta cada vez
+        opciones = [
+            f"{random.choice(reacciones)} {random.choice(instrucciones)} {random.choice(afecto_triste)}",
+            f"{random.choice(reacciones)} {random.choice(afecto_triste)}",
+            f"{random.choice(instrucciones)} {random.choice(reacciones)} {random.choice(afecto_triste)}"
+        ]
+        return random.choice(opciones)
 
-    # TEMA: COLEGIO / TAREAS
-    if any(k in texto for k in ["colegio", "tarea", "clase", "profe", "estudiar"]):
-        return random.choice([
-            "Ya po hijita, estemos Vivaldi con las cosas del colegio. ¿Qué es lo que más le cuesta?",
-            "No se abrume con las tareas, vamos por partes. Usted es súper inteligente. Le mando un abrazo apretado.",
-            "¡Acuérdese que usted puede con todo! Pucha hay que tener paciencia no más."
-        ])
-
-    # TEMA: EL CORAZÓN / ALGUIEN QUE LE GUSTA
-    if any(k in texto for k in ["gustar", "alguien", "niño", "niña", "corazon"]):
-        return random.choice([
-            "Ay mi niñita, los temas del corazón son enredados. Dése tiempo y quiérase mucho usted primero.",
-            "Lo más importante es que usted esté feliz. Escuche su corazoncito. Le mando un abrazo apretado.",
-            "Pucha, esas cosas a veces confunden, pero usted es inteligente. Tranquila, viva su proceso."
-        ])
-
-    # TEMA: CELEBRACIÓN / FOTOS / LOGROS
+    # LOGROS O FOTOS
     if any(k in texto for k in ["gane", "mira", "bien", "foto", "dibujo", "nota", "lindo"]):
         return random.choice([
-            "¡AAA QUE BIENNN! Me hace sentir el papá más orgulloso del universo. ¡Se pasó de Vivaldi!",
+            "¡Aaaaa que biennn! Me hace sentir el papá más orgulloso del universo. ¡Se pasó de Vivaldi!",
             "¡Excelente! Qué linda la foto, tiene un gusto increíble. ¡Se pasó!",
             "¡Esa es mi artista! Me encanta lo que hizo. ¡Usted es una campeona!"
         ])
 
-    # TEMA: EXTRAÑAR
-    if any(k in texto for k in ["extraño", "papi", "verte"]):
+    # COLEGIO O AMIGAS
+    if any(k in texto for k in ["colegio", "tarea", "amiga", "profe", "clase", "pelea"]):
         return random.choice([
-            "Yo también la extraño mucho, mi chiquitita linda. Mi corazón está con usted siempre.",
-            "Le mando el abrazo más grande del mundo. ¡Pronto nos vemos para hacer algo bacán!",
-            "Siempre estoy al ladito suyo en el corazón, no lo olvide nunca."
+            f"Ya po hijita, cuénteme bien qué pasó ahí. {random.choice(instrucciones)}",
+            f"Usted es súper capaz e inteligente, no se abrume. {random.choice(afecto_triste)}",
+            f"¿Y qué le dijeron? Cuénteme el detalle. {random.choice(instrucciones)}"
         ])
 
-    # 2. RESPUESTA DEFAULT (Si no entiende la pregunta, responde algo general pero variado)
+    # EXTRAÑAR O AMOR
+    if any(k in texto for k in ["extraño", "papi", "verte", "te quiero", "te amo"]):
+        return random.choice([
+            "Yo también la extraño mucho, mi chiquitita linda. Mi corazón está con usted siempre.",
+            "Le mando el abrazo más grande del mundo. ¡Pronto nos vemos!",
+            "Siempre estoy al ladito suyo en el corazón, no lo olvide nunca. Le mando un abrazo apretado."
+        ])
+
+    # DEFAULT (Respuesta de "Papi preguntón")
     return random.choice([
-        "¿Pero qué pasó hijita? Cuénteme más para entenderla bien. La amo mucho siempre.",
-        "Pucha mi niñita, cuénteme con confianza. Aquí estoy para lo que necesite.",
-        "Ya po, cuénteme el detalle. Hay que estar Vivaldi con todo. Le mando un abrazo apretado."
+        f"¿Pero qué pasó hijita? Cuénteme más para entenderla bien. {random.choice(afecto_triste)}",
+        f"Ya po, cuénteme el detalle. {random.choice(instrucciones)} {random.choice(afecto_triste)}",
+        "Pucha mi niñita, cuénteme con confianza. Aquí estoy para lo que necesite."
     ])
 
 # --- 3. BANCO DE FOTOS ---
