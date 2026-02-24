@@ -1,44 +1,51 @@
 import streamlit as st
+import random
 
 st.set_page_config(page_title="App de Ignacia", page_icon="🎀")
 
-st.title("❤️ ¡Bienvenida, mi Señora Matemáticas!")
+# --- LISTADO DE PALABRAS (Puedes agregar más aquí entre comillas y comas) ---
+palabras = ["Matemáticas", "Inteligente", "Preciosa", "Artista", "Científica", "Favorita", "Divertida"]
+palabra_del_dia = random.choice(palabras)
 
-# --- SECCIÓN DE ÁNIMO ---
-st.subheader("💬 ¿Cómo te sientes hoy, hija?")
+# --- INICIO: SOLO TEXTO ---
+st.title(f"❤️ ¡Hola, mi Señora {palabra_del_dia}!")
+
+st.subheader("💬 ¿Cómo te sientes en este momento?")
 animo = st.select_slider(
-    "Mueve la barrita para ver tu sorpresa:",
-    options=["Triste", "Normal", "Feliz", "¡Súper Feliz!"]
+    "Mueve la barrita para que papá te responda:",
+    options=["Selecciona", "Triste", "Normal", "Feliz", "¡Súper Feliz!"]
 )
 
 st.write("---")
 
-# --- VIDEO DE YOUTUBE ---
-st.subheader("📺 Un mensaje especial de papá")
-# He puesto tu video de YouTube aquí:
-st.video("https://youtu.be/sB-TdQKWMGI")
+# --- RESPUESTA DINÁMICA (Aquí aparece la foto/video solo después de contestar) ---
 
-# Reacciones según el ánimo
-if animo == "Triste":
-    st.info("Hija, aunque estés triste, recuerda estas palabras que te dije antes de conocerte. ¡Papá siempre estará para ti!")
-elif animo == "¡Súper Feliz!":
-    st.success("¡Esa alegría es contagiosa! ¡Eres el mejor regalo de la vida!")
-    st.balloons()
-    st.snow()
+if animo == "Selecciona":
+    st.write("Mueve la barrita de arriba para ver qué tiene papá para ti hoy...")
+
 else:
-    st.write("¡Este video es de cuando te estábamos esperando con mucha emoción! ❤️")
+    # 1. PEQUEÑA FRASE TUYA SEGÚN EL ÁNIMO
+    if animo == "Triste":
+        st.write("### Mi niña, no olvides que después de la lluvia siempre sale el sol. Aquí estoy para ti.")
+        st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", caption="Un abrazo virtual ❤️")
 
-# --- SECCIÓN DE FOTOS ---
-st.write("---")
-st.subheader("📸 Nuestros Recuerdos")
-col1, col2 = st.columns(2)
-with col1:
-    st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", caption="¡Amor infinito!")
-with col2:
-    st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg", caption="Tu alegría")
+    elif animo == "Normal":
+        st.write("### ¡Qué bueno que tengas un día tranquilo! Disfruta cada minuto.")
+        st.video("https://youtu.be/sB-TdQKWMGI") # El video de YouTube
 
-st.write("---")
-# RECUERDA: Pon tu número de WhatsApp real aquí
-st.link_button("💌 MANDARLE UN MENSAJE A PAPÁ", "https://wa.me/569XXXXXXXX")
+    elif animo == "Feliz":
+        st.write("### ¡Tu felicidad es mi mayor alegría! Nunca dejes de sonreír.")
+        st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg")
+        st.balloons()
 
-st.caption("Hecho con mucho ❤️ por tu papá.")
+    elif animo == "¡Súper Feliz!":
+        st.write("### ¡ESTO ES FIESTA! Eres la mejor del mundo entero.")
+        st.video("https://youtu.be/sB-TdQKWMGI")
+        st.balloons()
+        st.snow()
+
+    # --- BOTÓN DE WHATSAPP (Aparece solo después de contestar) ---
+    st.write("---")
+    st.link_button("💌 MANDARLE UN MENSAJE A PAPÁ", "https://wa.me/569XXXXXXXX")
+
+st.caption("Cada vez que entres, serás una 'Señora' diferente. ❤️")
