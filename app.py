@@ -58,34 +58,26 @@ urls_fotos = [
     "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
 ]
 
-# --- 5. SUS CHISTES REALES ---
+# --- 5. BANCO DE CHISTES (NUEVA LISTA DE IMAGEN) ---
 chistes_reales = [
-    "— En Hawai uno no se hospeda, se aloha.",
-    "— ¿Cómo se llama el campeón japonés de buceo? \n — Tokofondo. \n — ¿Y el segundo lugar? \n — Kasitoko.",
-    "Ayer pasé por tu casa y me tiraste una palta… qué palta de respeto.",
-    "Robinson Crusoe y lo atropellaron.",
-    "El otro día vi a un otaku triste y lo animé.",
-    "Ayer metí un libro de récords en la batidora y batí todos los récords.",
-    "— ¿Qué le dice un pan a otro pan? \n — Te presento una miga.",
-    "— Cuando estés triste abraza un zapato. \n — Un zapato consuela.",
-    "— Doctor, doctor, tengo un hueso afuera. \n — ¡Hágalo pasar!",
-    "— ¿Tiene zapatos de cocodrilo? \n — ¿Qué número calza su cocodrilo?",
-    "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo: Game Over.",
-    "— Un tipo va al oculista. \n — Mire la pared. \n — ¿Cuál pared?",
-    "— ¿Cómo se llama tu padre? \n — Igual. \n — ¿Don Igual? \n — Sí.",
-    "— ¿Cómo llaman a los bomberos? \n — Firemen. \n — Nosotros los llamamos por teléfono.",
-    "— ¿Te sabes el chiste del tarro? \n — No. \n — ¡Qué lata!",
-    "— Había un niñito que se llamaba Tarea. \n — Tarea para la casa. \n — Y Tarea se fue.",
-    "— Tengo un perro que dice “Hola”. \n — En mi casa tengo un tarro que dice “Nescafé”.",
-    "— ¿Qué le dijo un poste de luz a otro? \n — El último apaga la luz.",
-    "— ¿Aló, está Joaco? \n — No, Joaco Imprar.",
-    "— Señor, ¿hayalletas? (Hay galletas)",
-    "— ¿Cómo estornuda un tomate? \n — ¡Ketchup!",
-    "— ¿Qué le dijo un árbol a otro árbol? \n — Nos dejaron plantados.",
-    "— ¿Qué le dijo un techo a otro techo? \n — Techo de menos.",
-    "— ¿Qué hace una abeja en el gimnasio? \n — Zum-ba.",
-    "Robinson Crusoe… quedó solo.",
-    "— ¿Cuántos pelos tiene la cola de un caballo? \n — 30.583. \n — ¿Y cómo lo sabes? \n — Perdone profesor… pero esa ya es otra pregunta."
+    "1. — En Hawai uno no se hospeda, se aloha.",
+    "2. — ¿Cómo se llama el campeón japonés de buceo?\n— Tokofondo.\n— ¿Y el segundo lugar?\n— Kasitoko.",
+    "3. — Ayer pasé por tu casa y me tiraste una palta… qué palta de respeto.",
+    "4. — Robinson Crusoe y lo atropellaron.",
+    "5. — El otro día vi a un otaku triste y lo animé.",
+    "6. — Ayer metí un libro de récords en la batidora y batí todos los récords.",
+    "7. — ¿Qué le dice un pan a otro pan?\n— Te presento una miga.",
+    "8. — Cuando estés triste abraza un zapato.\n— Un zapato consuela.",
+    "9. — Doctor, doctor, tengo un hueso afuera.\n— ¡Hágalo pasar!",
+    "10. — Una señora llorando llega a una zapatería:\n— ¿Tiene zapatos de cocodrilo?\n— ¿Qué número calza su cocodrilo?",
+    "11. — Un tipo va al oculista.\n— Mire la pared.\n— ¿Cuál pared?",
+    "12. — Un español le pregunta a un inglés:\n— ¿Cómo llaman a los bomberos?\n— Firemen.\n— Nosotros los llamamos por teléfono.",
+    "13. — ¿Te sabes el chiste del tarro?\n— No.\n— ¡Qué lata!",
+    "14. — Tengo un perro que dice “Hola”.\n— En mi casa tengo un tarro que dice “Nescafé”.",
+    "15. — ¿Aló, está Joaco?\n— No, Joaco mprar.",
+    "16. — ¿Qué le dijo un techo a otro techo?\n— Techo de menos.",
+    "17. — ¿Qué hace una abeja en el gimnasio?\n— Zum-ba.",
+    "18. — Te haré una última pregunta. Si la sabes, te apruebo.\n¿Cuántos pelos tiene la cola de un caballo?\n— 30.583.\n— ¿Y cómo lo sabes?\n— Perdone profesor… pero esa ya es otra pregunta."
 ]
 
 # --- 6. CUERPO DE LA APP ---
