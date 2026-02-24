@@ -13,20 +13,20 @@ animo = st.select_slider(
 
 st.write("---")
 
-# --- VIDEO ÚNICO DE DRIVE ---
-# Este es el nuevo video que me pasaste
-st.subheader("📺 Un video especial para ti")
-st.video("https://drive.google.com/uc?export=download&id=1wk7a_c_hY1N9eQlrjdBRT1tdbtnxcwtn")
+# --- VIDEO DE YOUTUBE ---
+st.subheader("📺 Un mensaje especial de papá")
+# He puesto tu video de YouTube aquí:
+st.video("https://youtu.be/sB-TdQKWMGI")
 
 # Reacciones según el ánimo
 if animo == "Triste":
-    st.info("Hija, aunque estés triste, recuerda que siempre te haré sonreír. ¡Mira el video!")
+    st.info("Hija, aunque estés triste, recuerda estas palabras que te dije antes de conocerte. ¡Papá siempre estará para ti!")
 elif animo == "¡Súper Feliz!":
-    st.success("¡Esa alegría es contagiosa! ¡Eres la mejor!")
+    st.success("¡Esa alegría es contagiosa! ¡Eres el mejor regalo de la vida!")
     st.balloons()
     st.snow()
 else:
-    st.write("¡Espero que te guste este video que elegí para ti! ❤️")
+    st.write("¡Este video es de cuando te estábamos esperando con mucha emoción! ❤️")
 
 # --- SECCIÓN DE FOTOS ---
 st.write("---")
@@ -38,7 +38,7 @@ with col2:
     st.image("https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg", caption="Tu alegría")
 
 st.write("---")
-# RECUERDA: Pon tu número de WhatsApp real aquí (ej: https://wa.me/56912345678)
+# RECUERDA: Pon tu número de WhatsApp real aquí
 st.link_button("💌 MANDARLE UN MENSAJE A PAPÁ", "https://wa.me/569XXXXXXXX")
 
-st.caption("Hecho con ❤️ por tu papá.")
+st.caption("Hecho con mucho ❤️ por tu papá.")
