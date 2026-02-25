@@ -3,7 +3,7 @@ import random
 from openai import OpenAI
 import os
 
-# 1. CONFIGURACIÓN (Debe ir al principio)
+# 1. CONFIGURACIÓN
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
 # 2. FUNCIÓN DE LECTURA LIMPIA
@@ -13,62 +13,103 @@ def leer_archivo_limpio(nombre, es_adn=False):
         if os.path.exists(ruta):
             with open(ruta, "r", encoding="utf-8", errors="ignore") as f:
                 texto = f.read()
-                # Limpieza de caracteres invisibles
                 for r in ['Ñ', 'ï»¿', 'Â', '\ufffd']:
                     texto = texto.replace(r, '')
                 if es_adn: return texto.strip()
                 return [line.strip() for line in texto.split('\n') if line.strip()]
     except: pass
-    return "Eres Luis, el papá de Ignacita." if es_adn else ["Ignacita"]
+    return "Eres Luis, el papá de Ignacita." if es_adn else ["Dinosauria"]
 
-# Carga de datos
-ADN_SISTEMA = leer_archivo_limpio("adn.txt", es_adn=True)
+ADN_SISTEMA_BASE = leer_archivo_limpio("adn.txt", es_adn=True)
 APODOS = leer_archivo_limpio("senoras.txt")
 LISTA_CHISTES = leer_archivo_limpio("chistes.txt")
 
-# 3. LÓGICA DE NAVEGACIÓN
+# REFUERZO DE PERSONALIDAD: Obligamos a la IA a recordar que habla con SU HIJA
+ADN_REFORZADO = f"""
+{ADN_SISTEMA_BASE}
+
+INSTRUCCIÓN CRUCIAL: Estás hablando DIRECTAMENTE con tu hija Ignacita (o sus apodos de señora). 
+NUNCA respondas como si hablaras con Luis. Luis eres TÚ (el narrador). 
+Usa frases como "mi amor", "hijita", "mi vida". 
+Si ella pregunta por alguien, responde: "Es tu tío...", "Es tu abuela...", "Es amigo de tu papá (yo)".
+"""
+
+# 3. LÓGICA DE NAVEGACIÓN (Persistencia mejorada)
 if "entrado" not in st.session_state:
     st.session_state.entrado = False
 
-# --- PANTALLA DE PORTADA ---
+# --- PANTALLA DE PORTADA (LOGO ARRIBA Y CLICK TOTAL) ---
 if not st.session_state.entrado:
-    # Estilo para que la portada ocupe todo
     st.markdown("""
-        <style>
+    <style>
         .stApp { background-color: black; }
-        .portada-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; }
-        .logo-img { width: 80%; max-width: 400px; margin-top: -50px; }
-        </style>
-        """, unsafe_allow_html=True)
+        .portada-full {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            z-index: 1000;
+        }
+        .logo-superior {
+            margin-top: 50px;
+            width: 70%;
+            max-width: 400px;
+            z-index: 1001;
+        }
+        .video-fondo {
+            width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+            margin-top: 20px;
+            z-index: 1000;
+        }
+        .stButton > button {
+            position: fixed !important;
+            top: 0 !important; left: 0 !important;
+            width: 100vw !important; height: 100vh !important;
+            background: transparent !important;
+            border: none !important;
+            color: transparent !important;
+            z-index: 99999 !important;
+        }
+    </style>
+    <div class="portada-full">
+        <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-superior">
+        <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-fondo">
+    </div>
+    """, unsafe_allow_html=True)
     
-    with st.container():
-        st.image("https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif", use_container_width=True)
-        st.markdown('<div style="text-align:center"><img src="https://i.postimg.cc/Bb71JpGr/image.png" style="width:70%"></div>', unsafe_allow_html=True)
-        
-        st.write("") # Espacio
-        if st.button("✨ ENTRAR AL MUNDO DE PAAPI ✨", use_container_width=True):
-            st.session_state.entrado = True
-            st.session_state.nombre = random.choice(APODOS)
-            st.rerun()
+    if st.button("ENTRAR", key="click_total"):
+        st.session_state.entrado = True
+        adjetivo = random.choice(APODOS)
+        st.session_state.nombre_saludo = f"señora {adjetivo}"
+        st.rerun()
 
 # --- INTERIOR DE LA APP ---
 else:
     st.markdown("<style>.stApp { background-color: white; }</style>", unsafe_allow_html=True)
-    st.title(f"❤️ ¡Hola, mi {st.session_state.nombre}!")
     
-    # Imagen principal
-    st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
+    # 1. Saludo: ¡Hola, mi señora [adjetivo]!
+    st.title(f"❤️ ¡Hola, mi {st.session_state.nombre_saludo}!")
     
-    # Botón WhatsApp
+    # 2. Galería de Fotos Dinámica (Muestra una distinta cada vez que entra/actualiza)
+    fotos = [
+        "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg",
+        "https://i.postimg.cc/Bb71JpGr/image.png" # Agregue aquí más links de sus fotos
+    ]
+    st.image(random.choice(fotos), use_container_width=True)
+    
     st.markdown('<a href="https://wa.me/56992238085" target="_blank" style="background-color:#25D366;color:white;padding:15px;border-radius:10px;text-decoration:none;display:block;text-align:center;font-weight:bold;margin-bottom:20px;">📲 HABLAR CON PAPI REAL</a>', unsafe_allow_html=True)
     
-    # Botón Chistes
     if st.button("🤡 ¡Papi, cuéntame un chiste!", use_container_width=True):
         st.info(random.choice(LISTA_CHISTES))
 
     st.divider()
     
-    # Chat
     if "chat" not in st.session_state: st.session_state.chat = []
     for m in st.session_state.chat:
         with st.chat_message(m["role"]): st.markdown(m["content"])
@@ -80,7 +121,7 @@ else:
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
             res = client.chat.completions.create(
                 model="gpt-4o-mini",
-                messages=[{"role": "system", "content": ADN_SISTEMA}] + st.session_state.chat
+                messages=[{"role": "system", "content": ADN_REFORZADO}] + st.session_state.chat
             )
             r = res.choices[0].message.content
         except: r = "Pucha mi amor, se cortó la señal, pero pAAPi te adora."
