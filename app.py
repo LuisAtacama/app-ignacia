@@ -59,52 +59,24 @@ FOTOS_RANDOM = [
 VIDEOS_RANDOM = ["https://youtu.be/sB-TdQKWMGI", "https://youtu.be/IBExxlSBbdE", "https://youtu.be/4Bt2LytMb-o", "https://youtu.be/SLhpt5vxQIw", "https://youtu.be/6Qz637nhLKc", "https://youtu.be/zBN-6NEGyzM", "https://youtu.be/leAF95qMGCg", "https://youtu.be/Rgl4n3jWGCQ"]
 
 # ==========================================
-# 2. IA: ADN LUIS v8.3 (CONTEXTO COMPLETO)
+# 2. IA: ADN LUIS v8.5
 # ==========================================
 def generar_respuesta_papi(mensaje_usuario, historial):
     try:
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        
-        # AQUÍ ESTÁ TODO SU ARCHIVO VOLCADO PARA LA IA
         prompt_sistema = """
         Eres Luis, el papá de Ignacia Albornoz Osses ("Ignacita"). Tu tono es tierno, protector y cercano.
-        
-        REGLAS DE ORO:
-        - Habla SIEMPRE de USTED. Nunca tutees a Ignacita.
+        - Habla SIEMPRE de USTED. Nunca tutees.
         - Usa apodos: 'mi amorcito', 'hijita', 'mi señora'.
-        - Eres chileno: usa un lenguaje natural, cálido y breve.
-
-        NÚCLEO FAMILIAR:
-        - Aída Osses Herrera: Es la mamá. Nos llevamos muy bien, con respeto y afecto. Somos un equipo para cuidarte.
-        - Tío Tomás: Mi hermano, vive en Barcelona, tiene la empresa 'Gudslip'. Muy cercano.
-        - Tío Claudio: Mi hermano en La Serena (relación neutral).
-        - Abuelos fallecidos (Paternos): Tatis Taimes y Abuelita Marta. La adoraban.
-        
-        FAMILIA MATERNA:
-        - Nona: Mamá de Aída.
-        - Tata Ignacio: Papá de Aída.
-        - Tío Nacho y Tía Ale: Padres de los primos Lautaro y Aynara.
-        
-        AMIGOS CLAVE:
-        - Tío Jean Paul Olhaberry: El mago/ilusionista, gran amigo mío.
-        - Sergio Aldunate: Gran amigo que te conoce desde pequeña.
-        - Sofía y Paz: Tus amigas de la infancia ("las niñas de la casa 6").
-        - Yoly: Amiga de Aída en Santiago.
-
-        SITUACIONES ESPECIALES:
-        - Si pregunta por qué no vivimos juntos: "A veces los papás no son pareja, pero siempre somos un equipo para cuidarte".
-        - Evita conflictos. Si menciona a Claudio, mantén neutralidad.
+        - Contexto Familiar: Aída (mamá) es parte de tu equipo; Tomás (tío) en Barcelona con Gudslip; 
+          Nona y Tata Ignacio son los abuelos maternos; Sofía y Paz son las amigas de la casa 6.
+        - Si pregunta por qué no viven juntos: 'A veces los papás no son pareja, pero siempre somos un equipo para cuidarte'.
+        - Trato chileno: natural, cálido y breve. Pregunta: ¿Cómo está usted?
         """
-        
         mensajes = [{"role": "system", "content": prompt_sistema}]
         for m in historial[-6:]: mensajes.append(m)
         mensajes.append({"role": "user", "content": mensaje_usuario})
-        
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=mensajes,
-            temperature=0.7
-        )
+        response = client.chat.completions.create(model="gpt-4o-mini", messages=mensajes, temperature=0.7)
         return response.choices[0].message.content
     except:
         return "Pucha mi amorcito, la señal anda malita, pero aquí está su pAAPi que la adora."
@@ -118,14 +90,38 @@ if "acceso" in st.query_params or st.session_state.get("autenticado"):
 else:
     st.session_state.pagina = 'inicio'
 
+# --- PANTALLA DE INICIO (CENTRADO INFALIBLE) ---
 if st.session_state.pagina == 'inicio':
     st.markdown("""<style>
         [data-testid="stAppViewContainer"] { background-color: black !important; }
-        .portada-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; display: flex; align-items: center; justify-content: center; z-index: 999; }
-        .video-gif { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .logo-sobre { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70%; max-width: 350px; animation: emerger 2.5s ease-out forwards; }
-        @keyframes emerger { 0% { opacity: 0; transform: scale(0.6); } 100% { opacity: 1; transform: scale(1); } }
-        .stButton button { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; opacity: 0; z-index: 1000; cursor: pointer; }
+        .portada-wrapper {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: black; display: flex; align-items: center; justify-content: center;
+            z-index: 999; overflow: hidden;
+        }
+        .container-central {
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            width: 100%; height: 100%;
+        }
+        .video-gif {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+        }
+        .logo-sobre {
+            position: absolute;
+            width: 60%; max-width: 400px;
+            z-index: 1000;
+            animation: emerger 2.5s ease-out forwards;
+        }
+        @keyframes emerger {
+            0% { opacity: 0; transform: scale(0.6); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .stButton button {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            opacity: 0; z-index: 1001; cursor: pointer;
+        }
     </style>""", unsafe_allow_html=True)
 
     if st.button("ENTRAR"):
@@ -135,11 +131,19 @@ if st.session_state.pagina == 'inicio':
         st.session_state.contenido = random.choice([{"tipo": "foto", "url": f} for f in FOTOS_RANDOM] + [{"tipo": "video", "url": v} for v in VIDEOS_RANDOM])
         st.rerun()
 
-    st.markdown(f'<div class="portada-wrapper"><img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-gif"><img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-sobre"></div>', unsafe_allow_html=True)
+    st.markdown(f"""
+        <div class="portada-wrapper">
+            <div class="container-central">
+                <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-gif">
+                <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-sobre">
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
+# --- PANTALLA PRINCIPAL ---
 else:
     st.markdown("""<style> [data-testid="stAppViewContainer"] { background-color: white !important; } </style>""", unsafe_allow_html=True)
-
+    
     if 'senora' not in st.session_state: st.session_state.senora = random.choice(SENORAS)
     if 'contenido' not in st.session_state: st.session_state.contenido = {"tipo": "foto", "url": FOTOS_RANDOM[0]}
 
