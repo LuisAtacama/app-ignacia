@@ -6,17 +6,19 @@ from datetime import datetime
 from openai import OpenAI
 
 # ==========================================
-# 1. CONFIGURACIÓN Y BITÁCORA (DB)
+# 1. CONFIGURACIÓN Y BITÁCORA (DB) - REPARADO
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
 class MemoryStore:
     def __init__(self):
+        # Conexión a la base de datos para el trazado de Don Luis
         self.conn = sqlite3.connect('papi_memory.db', check_same_thread=False)
         self.cursor = self.conn.cursor()
         self.setup()
 
     def setup(self):
+        # Aseguramos que la tabla de la bitácora exista (reparando lo borrado)
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS bitacora 
                              (id INTEGER PRIMARY KEY, fecha TEXT, animo TEXT, pregunta TEXT, respuesta TEXT)''')
         self.conn.commit()
@@ -28,7 +30,7 @@ class MemoryStore:
         self.conn.commit()
 
 # ==========================================
-# 2. IA: ADN LUIS v4.5 (Naturalidad y Variedad)
+# 2. IA: ADN LUIS v4.5 (Sin repeticiones)
 # ==========================================
 def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
     try:
@@ -39,19 +41,18 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         prompt_sistema = f"""
         Eres Luis, papá de Ignacia. Chileno, tierno y protector.
         
-        REGLAS DE VOCABULARIO (SÉ NATURAL):
+        REGLAS DE VOCABULARIO (NATURALIDAD):
         - Usa apodos variados: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
-        - CRÍTICO: No repitas el mismo apodo dos veces en la misma respuesta. 
-        - Si usas 'Si mi amorcito dígame', no agregues más apodos en esa frase.
-        - PROHIBIDO: 'amor' (a secas), 'mi vida' o 'Ignacia' (a secas).
+        - REGLA CRÍTICA: Nunca repitas el mismo apodo dos veces en una sola respuesta.
+        - Si usas la frase 'Si mi amorcito dígame', NO agregues ningún otro apodo en el resto del mensaje.
+        - PROHIBIDO: 'amor' (solo), 'mi vida' o 'Ignacia' (solo).
         
-        INSTRUCCIÓN DE EMPATÍA:
-        - Si ella dice que está 'mal', no cambies de tema. Quédate ahí, escúchala y consuélala.
-        - No menciones a terceros (mamá, amigas, tíos) si ella no los nombra.
+        MANEJO DE CONTEXTO:
+        - Solo nombra a personas (Aída, Sofía, etc.) si ella las menciona primero.
+        - Si ella dice que está 'mal', quédate ahí con ella. No cambies de tema.
         
-        ESTILO: Breve, cálido, chileno. 
-        Evita sonar como un asistente; habla como un papá que está mandando un audio o un mensaje rápido.
-        MODO: {modo}. ÁNIMO ACTUAL: {animo_actual}.
+        ESTILO: Breve, cálido, chileno ('Vivaldi', 'pucha'). Habla como un papá, no como un robot.
+        MODO: {modo}. ÁNIMO: {animo_actual}.
         """
         
         mensajes = [{"role": "system", "content": prompt_sistema}]
@@ -61,16 +62,16 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=mensajes,
-            temperature=0.6 # Bajamos un poco la temperatura para que sea más preciso
+            temperature=0.6 # Temperatura más baja para evitar repeticiones robóticas
         )
         res = response.choices[0].message.content
         MemoryStore().registrar_bitacora(animo_actual, mensaje_usuario, res)
         return res
     except:
-        return "Pucha mi niñita, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
+        return "Pucha mi amorcito, algo pasó con la señal, pero aquí está tu pAAPi. ¡Vivaldi!"
 
 # ==========================================
-# 3. DISEÑO Y NAVEGACIÓN
+# 3. DISEÑO CSS
 # ==========================================
 st.markdown("""<style>
     .stApp { background-color: #FFFFFF; }
@@ -92,12 +93,12 @@ if st.query_params.get("papi") == "vivaldi":
     with st.sidebar:
         st.success("🕵️ MODO SUPERVISOR")
         db = MemoryStore()
-        registros = db.conn.execute("SELECT * FROM bitacora ORDER BY id DESC").fetchall()
-        for reg in registros:
+        for reg in db.conn.execute("SELECT * FROM bitacora ORDER BY id DESC").fetchall():
             st.info(f"📅 {reg[1]} | 😊 {reg[2]}\n\n**Ella:** {reg[3]}\n\n**Papi:** {reg[4]}")
 
 if 'pagina' not in st.session_state: st.session_state.pagina = 'inicio'
 
+# --- PANTALLA INICIO ---
 if st.session_state.pagina == 'inicio':
     st.markdown("<div style='height: 25vh;'></div><div class='intro-btn' style='text-align:center;'>", unsafe_allow_html=True)
     if st.button("pAAPi", key="start"):
@@ -105,20 +106,27 @@ if st.session_state.pagina == 'inicio':
         st.rerun()
     st.markdown("</div><p style='text-align:center;'>Toca para entrar</p>", unsafe_allow_html=True)
 
+# --- PANTALLA PRINCIPAL ---
 else:
     if 'saludo' not in st.session_state:
         st.session_state.saludo = f"❤️ ¡Hola, mi {random.choice(['hijita', 'mi amorcito', 'mi chiquitita'])}!"
 
     st.title(st.session_state.saludo)
     animo = st.select_slider("¿Cómo te sientes?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
+    
+    # FOTO
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
 
-    st.markdown("<div class='button-container'>", unsafe_allow_width=True)
+    # BOTONES (Chistes y WhatsApp)
+    st.markdown("<div class='button-container'>", unsafe_allow_html=True)
     st.markdown(f"""<a href='https://wa.me/56992238085' class='whatsapp-btn'>📲 HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
+    
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
-        st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]))
+        chistes = ["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]
+        st.info(random.choice(chistes))
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # CHAT
     st.divider()
     st.write("### 💬 Chat con pAAPi")
     if "messages" not in st.session_state: st.session_state.messages = []
