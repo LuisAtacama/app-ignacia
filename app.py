@@ -12,8 +12,11 @@ st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layou
 
 # --- CONEXIÓN GOOGLE SHEETS ---
 try:
+    # Aquí usamos directamente el enlace para que no haya duda
+    url = st.secrets["connections"]["gsheets"]["spreadsheet"]
     conn = st.connection("gsheets", type=GSheetsConnection)
-except Exception:
+except Exception as e:
+    st.error(f"Error de conexión: {e}") # Esto nos avisará qué pasa
     conn = None
 
 # --- CARGA DE DATOS EXTERNOS (MEMORIA VIVALDI) ---
