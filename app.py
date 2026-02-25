@@ -15,7 +15,8 @@ st.markdown("""
         background: black; display: flex; align-items: center; justify-content: center; z-index: 999;
     }
     .logo-sobre { position: absolute; width: 80%; max-width: 500px; z-index: 1000; pointer-events: none; }
-    .btn-invisible > button {
+    /* Botón invisible que cubre TODA la pantalla */
+    div.stButton > button:first-child {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: transparent !important; border: none !important; color: transparent !important;
         z-index: 9999 !important; cursor: pointer;
@@ -41,13 +42,14 @@ if "entrado" not in st.session_state:
     st.session_state.entrado = False
 
 if not st.session_state.entrado:
+    # Mostramos portada
     st.markdown('<div class="portada-negra"><img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" style="height:100%"><img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-sobre"></div>', unsafe_allow_html=True)
-    st.markdown('<div class="btn-invisible">', unsafe_allow_html=True)
+    # El botón invisible
     if st.button("ENTRAR", key="gate_key"):
         st.session_state.entrado = True
         st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
 else:
+    # --- INTERIOR ---
     APODOS, CHISTES, ADN_SISTEMA = cargar_todo()
     if "saludo" not in st.session_state:
         st.session_state.saludo = random.choice(APODOS)
@@ -55,6 +57,7 @@ else:
     st.title(f"❤️ ¡Hola, mi {st.session_state.saludo}!")
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
     
+    # WhatsApp
     st.markdown('<a href="https://wa.me/56992238085" target="_blank" style="background-color: #25D366; color: white; padding: 15px; border-radius: 10px; text-decoration: none; display: block; text-align: center; font-weight: bold; margin-bottom: 20px;">📲 HABLAR CON PAPI REAL</a>', unsafe_allow_html=True)
 
     if st.button("🤡 ¡Papi, cuéntame un chiste!", key="joke"):
