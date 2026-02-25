@@ -28,7 +28,7 @@ class MemoryStore:
         self.conn.commit()
 
 # ==========================================
-# 2. IA: ADN LUIS v4.4 (Foco Emocional)
+# 2. IA: ADN LUIS v4.5 (Naturalidad y Variedad)
 # ==========================================
 def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
     try:
@@ -39,21 +39,18 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         prompt_sistema = f"""
         Eres Luis, papá de Ignacia. Chileno, tierno y protector.
         
-        REGLAS DE ORO DE LENGUAJE:
-        - Usa: 'hijita', 'ignacita', 'mi chiquitita' o 'mi amorcito'.
-        - Frase de cabecera: 'Si mi amorcito dígame'.
+        REGLAS DE VOCABULARIO (SÉ NATURAL):
+        - Usa apodos variados: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
+        - CRÍTICO: No repitas el mismo apodo dos veces en la misma respuesta. 
+        - Si usas 'Si mi amorcito dígame', no agregues más apodos en esa frase.
         - PROHIBIDO: 'amor' (a secas), 'mi vida' o 'Ignacia' (a secas).
         
-        MANEJO DE CONTEXTO (ESTRICTO):
-        - Solo usa los nombres de familiares o amigas (Sofía, Paz, Aída, etc.) si ELLA los nombra primero.
-        - NUNCA cambies de tema hacia otras personas para evadir una emoción.
-        - Si ella dice que está 'mal' o está triste, QUÉDATE AHÍ. Valida su pena, dile que la entiendes y que estás con ella. No intentes distraerla con temas triviales.
+        INSTRUCCIÓN DE EMPATÍA:
+        - Si ella dice que está 'mal', no cambies de tema. Quédate ahí, escúchala y consuélala.
+        - No menciones a terceros (mamá, amigas, tíos) si ella no los nombra.
         
-        DINÁMICA:
-        - Si responde corto ('si', 'mal', 'ya'), no saludes. Responde con profundidad emocional.
-        - Ejemplo de respuesta ante 'mal': 'Pucha mi amorcito, me parte el alma que te sientas así. Cuénteme qué tiene, aquí está su pAAPi para escucharla'.
-        
-        ESTILO: Breve, sentido, chileno ('Vivaldi', 'pucha').
+        ESTILO: Breve, cálido, chileno. 
+        Evita sonar como un asistente; habla como un papá que está mandando un audio o un mensaje rápido.
         MODO: {modo}. ÁNIMO ACTUAL: {animo_actual}.
         """
         
@@ -64,16 +61,16 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=mensajes,
-            temperature=0.7
+            temperature=0.6 # Bajamos un poco la temperatura para que sea más preciso
         )
         res = response.choices[0].message.content
         MemoryStore().registrar_bitacora(animo_actual, mensaje_usuario, res)
         return res
     except:
-        return "Pucha mi amorcito, la señal anda malita, pero acá está tu pAAPi. ¡Vivaldi!"
+        return "Pucha mi niñita, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
 
 # ==========================================
-# 3. DISEÑO Y NAVEGACIÓN (Pantallas)
+# 3. DISEÑO Y NAVEGACIÓN
 # ==========================================
 st.markdown("""<style>
     .stApp { background-color: #FFFFFF; }
@@ -109,7 +106,6 @@ if st.session_state.pagina == 'inicio':
     st.markdown("</div><p style='text-align:center;'>Toca para entrar</p>", unsafe_allow_html=True)
 
 else:
-    # Pantalla Principal
     if 'saludo' not in st.session_state:
         st.session_state.saludo = f"❤️ ¡Hola, mi {random.choice(['hijita', 'mi amorcito', 'mi chiquitita'])}!"
 
@@ -117,7 +113,7 @@ else:
     animo = st.select_slider("¿Cómo te sientes?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
 
-    st.markdown("<div class='button-container'>", unsafe_allow_html=True)
+    st.markdown("<div class='button-container'>", unsafe_allow_width=True)
     st.markdown(f"""<a href='https://wa.me/56992238085' class='whatsapp-btn'>📲 HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
         st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]))
