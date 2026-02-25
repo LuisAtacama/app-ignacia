@@ -1,121 +1,209 @@
 import streamlit as st
 import random
+import json
+import sqlite3
+from datetime import datetime
 from openai import OpenAI
 
-# 1. CONFIGURACIÓN DE PÁGINA
-st.set_page_config(page_title="App de Ignacia", page_icon="🎀", layout="centered")
+# ==========================================
+# 1. CONFIGURACIÓN Y MEMORIA (SQLite)
+# ==========================================
+st.set_page_config(page_title="Papi Digital - Ignacia Edition", page_icon="🎀", layout="centered")
 
-# --- CONEXIÓN A IA (SECRETS) ---
-try:
-    # Asegúrese de actualizar su API KEY en los Secrets de Streamlit con la nueva llave
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-except Exception as e:
-    st.error("Error: Verifique su nueva API KEY en los Secrets de Streamlit.")
+class MemoryStore:
+    def __init__(self):
+        self.conn = sqlite3.connect('papi_memory.db', check_same_thread=False)
+        self.cursor = self.conn.cursor()
+        self.setup()
 
-# --- DISEÑO CSS (ORDEN Y CENTRADO) ---
-st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    def setup(self):
+        self.cursor.execute('''CREATE TABLE IF NOT EXISTS episodes 
+                             (id INTEGER PRIMARY KEY, date TEXT, event TEXT, tags TEXT)''')
+        self.conn.commit()
+
+    def add_episode(self, event, tags):
+        date = datetime.now().strftime("%Y-%m-%d %H:%M")
+        self.cursor.execute("INSERT INTO episodes (date, event, tags) VALUES (?, ?, ?)", 
+                           (date, event, str(tags)))
+        self.conn.commit()
+
+    def get_recent(self):
+        self.cursor.execute("SELECT event FROM episodes ORDER BY id DESC LIMIT 3")
+        return [row[0] for row in self.cursor.fetchall()]
+
+# ==========================================
+# 2. MOTOR EMOCIONAL CON RUTINA HORARIA
+# ==========================================
+class EmotionEngine:
+    def __init__(self):
+        if 'state' not in st.session_state:
+            st.session_state.state = {
+                "mode": "cariño",
+                "emotion": {"ternura": 9, "proteccion": 8, "orgullo": 6, "humor": 6, "estructura": 6, "ansiedad_suave": 2, "energia": 7, "poesia": 5}
+            }
+
+    def update_by_context(self, tags):
+        s = st.session_state.state
+        ahora = datetime.now().hour
+        
+        if ahora >= 21 or ahora <= 6:
+            s["mode"] = "cierre_noche"
+            s["emotion"]["ternura"] = 10
+            s["emotion"]["energia"] = 3
+            s["emotion"]["poesia"] = 8
+        elif "viaje_transporte" in tags:
+            s["mode"] = "logistica"
+            s["emotion"]["proteccion"] += 2
+        elif "logro" in tags:
+            s["mode"] = "celebracion"
+            s["emotion"]["orgullo"] += 3
+        elif "problema" in tags:
+            s["mode"] = "contencion"
+            s["emotion"]["ternura"] += 2
+        
+        for k in s["emotion"]:
+            s["emotion"][k] = max(0, min(10, s["emotion"][k]))
+
+def classify_context(text):
+    t = text.lower()
+    tags = []
+    if any(k in t for k in ["avión", "vuelo", "bus", "llegue", "uber", "furgón"]): tags.append("viaje_transporte")
+    if any(k in t for k in ["saqué", "gané", "logré", "7", "6", "bien"]): tags.append("logro")
+    if any(k in t for k in ["triste", "miedo", "mal", "lloré", "pelea"]): tags.append("problema")
+    if any(k in t for k in ["noche", "dormir", "sueño", "chao"]): tags.append("cierre_noche")
+    return tags
+
+# ==========================================
+# 3. GENERADOR ADN v2.0
+# ==========================================
+def generar_respuesta_papi_v2(mensaje_usuario):
+    try:
+        client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+        tags = classify_context(mensaje_usuario)
+        
+        engine = EmotionEngine()
+        engine.update_by_context(tags)
+        
+        db = MemoryStore()
+        recuerdos = db.get_recent()
+        if tags: db.add_episode(mensaje_usuario, tags)
+
+        prompt_sistema = f"""
+        Eres Luis, el papá real de Ignacia. Chileno, tierno y protector.
+        MODO ACTUAL: {st.session_state.state['mode']}
+        ADN:
+        - Usa diminutivos ('hijita', 'niñita').
+        - Si el modo es 'cierre_noche': Sé muy dulce, desea dulces sueños, di que descanse.
+        - Si el modo es 'celebracion': ¡Siiiii! ¡Esoooo! Qué orgullo.
+        - Errores humanos: Alguna letra alargada ('Aaaa que biennnn').
+        - RECUERDOS RECIENTES: {recuerdos}
+        - ESTADO EMOCIONAL: {json.dumps(st.session_state.state['emotion'])}
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": prompt_sistema}, {"role": "user", "content": mensaje_usuario}],
+            temperature=0.8
+        )
+        return response.choices[0].message.content
+    except:
+        return "Pucha mi chiquitita, la señal anda malita, pero te amo infinito. ¡Vivaldi siempre!"
+
+# ==========================================
+# 4. INTERFAZ (UI) - DISEÑO MEJORADO
+# ==========================================
+st.markdown("""<style>
     .stApp { background-color: #FFFFFF; }
-    .main .block-container { background-color: #FFFFFF; padding: 20px !important; max-width: 650px; font-family: 'Inter', sans-serif; }
-    h1, h3 { color: #1A1A1A !important; text-align: center; margin-bottom: 15px; }
+    h1 { text-align: center; color: #1a1a1a; font-weight: 700; margin-bottom: 0px; }
+    h3 { text-align: center; color: #4a4a4a; margin-top: 10px; }
     
-    /* Botones Centrados */
-    .centrar-flex { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0; }
-    .stButton > button { display: block; margin: 0 auto; border-radius: 50px; padding: 10px 25px; border: 1px solid #EEE; background-color: white; }
-    
-    .whatsapp-btn { 
-        background-color: #25D366; color: white !important; padding: 12px 25px; border-radius: 50px; 
-        text-decoration: none !important; font-weight: 700; display: inline-flex; align-items: center; gap: 10px;
+    /* Contenedor de botones centrados */
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px; /* Separación leve entre botones */
+        margin: 25px 0;
     }
     
-    .chiste-box { background-color: #F8F9FA; border-radius: 15px; padding: 20px; text-align: center; border: 1px solid #EEE; margin-bottom: 20px; width: 100%; font-size: 18px; }
-    .stChatMessage { border-radius: 15px; }
-    </style>
-    """, unsafe_allow_html=True)
+    .whatsapp-btn { 
+        background-color: #25D366; 
+        color: white !important; 
+        padding: 14px 30px; 
+        border-radius: 50px; 
+        text-decoration: none !important; 
+        font-weight: bold; 
+        display: inline-flex; 
+        align-items: center; 
+        gap: 10px;
+        font-size: 16px;
+        box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+    }
 
-# --- DATOS (LISTAS) ---
-palabras = ["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Chiquitita", "Nintendita", "Kirbicita", "Monopoly"]
-urls_fotos = ["https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg", "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg", "https://i.postimg.cc/SsWjjTQz/IMG-5038.jpg", "https://i.postimg.cc/858jpQG5/IMG-5046.jpg", "https://i.postimg.cc/dV17njnY/IMG-5047.jpg", "https://i.postimg.cc/zXpbncw5/IMG-5065.jpg", "https://i.postimg.cc/02ZMpBGq/IMG-5072.jpg", "https://i.postimg.cc/TYQLr4Vz/IMG-5075.jpg", "https://i.postimg.cc/dtnk8x2n/IMG-5078.jpg", "https://i.postimg.cc/YqtLLHWF/IMG-5084.jpg", "https://i.postimg.cc/xT9NN2zJ/IMG-5093.jpg", "https://i.postimg.cc/Dy744TXW/IMG-5094.jpg", "https://i.postimg.cc/HsT88gyy/IMG-5095.jpg", "https://i.postimg.cc/FzVfCP2H/IMG-5096.jpg", "https://i.postimg.cc/br9GV6Kh/IMG-5097.jpg", "https://i.postimg.cc/rsNdZhvq/IMG-5098.jpg", "https://i.postimg.cc/Vv8rRyZH/IMG-5107.jpg", "https://i.postimg.cc/63R4n6cY/IMG-5111.jpg", "https://i.postimg.cc/ZR3vpYHL/IMG-5115.jpg", "https://i.postimg.cc/cHYtw1hm/IMG-5117.jpg", "https://i.postimg.cc/B6DPHZpj/IMG-5123.jpg", "https://i.postimg.cc/DzRbS4rL/IMG-5163.jpg", "https://i.postimg.cc/MGgjnf7S/IMG-5186.jpg", "https://i.postimg.cc/0NhJzKpT/IMG-5189.jpg", "https://i.postimg.cc/Gp4y3xyn/IMG-5204.jpg", "https://i.postimg.cc/bwCnjBdT/IMG-5214.jpg", "https://i.postimg.cc/FHWSQB1f/IMG-5215.jpg", "https://i.postimg.cc/251Zj7Zp/IMG-5239.jpg", "https://i.postimg.cc/fbV9Wf07/IMG-5241.jpg", "https://i.postimg.cc/wjTNZpqZ/IMG-5256.jpg", "https://i.postimg.cc/W1bZCvNQ/IMG-5282.jpg", "https://i.postimg.cc/FHsS84rq/IMG-5285.jpg", "https://i.postimg.cc/HksMRgYP/IMG-5290.jpg", "https://i.postimg.cc/qMGn1RTG/IMG-5291.jpg", "https://i.postimg.cc/hPnT8mHf/IMG-5295.jpg", "https://i.postimg.cc/gjVRFc6R/IMG-5324.jpg", "https://i.postimg.cc/sxdSNG1y/IMG-5365.jpg", "https://i.postimg.cc/L5Kfbg5T/IMG-5367.jpg", "https://i.postimg.cc/fynXrSyC/IMG-5371.jpg", "https://i.postimg.cc/0jRmBKjp/IMG-5378.jpg", "https://i.postimg.cc/W4y00Hvd/IMG-5384.jpg", "https://i.postimg.cc/XvqwG0tm/IMG-5395.jpg", "https://i.postimg.cc/VNvjrc27/IMG-5449.jpg", "https://i.postimg.cc/BvbxLGRV/IMG-5473.jpg", "https://i.postimg.cc/QMCp9rvq/IMG-5480.jpg", "https://i.postimg.cc/R0hc6z2G/IMG-5486.jpg", "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"]
-chistes_reales = ["— En Hawai uno no se hospeda, se aloha.", "— ¿Cómo se llama el campeón japonés de buceo?\n— Tokofondo.\n— ¿Y el segundo lugar?\n— Kasitoko.", "— Ayer pasé por tu casa y me tiraste una palta… qué palta de respeto.", "— Robinson Crusoe y lo atropellaron.", "— El otro día vi a un otaku triste y lo animé.", "— Ayer metí un libro de récords en la batidora y batí todos los récords.", "— ¿Qué le dice un pan a otro pan?\n— Te frente una miga.", "— Cuando estés triste abraza un zapato.\n— Un zapato consuela.", "— Doctor, doctor, tengo un hueso afuera.\n— ¡Hágalo pasar!", "— Una señora llorando llega a una zapatería:\n— ¿Tiene zapatos de cocodrilo?\n— ¿Qué número calza su cocodrilo?", "— Un tipo va al oculista.\n— Mire la pared.\n— ¿Cuál pared?", "— ¿Cómo llaman a los bomberos?\n— Firemen. Nosotros los llamamos por teléfono.", "— ¿Te sabes el chiste del tarro?\n— No. ¡Qué lata!", "— Tengo un perro que dice “Hola”.\n— En mi casa tengo un tarro que dice “Nescafé”.", "— ¿Aló, está Joaco?\n— No, Joaco mprar.", "— ¿Qué le dijo un techo a otro techo?\n— Techo de menos.", "— ¿Qué hace una abeja en el gimnasio?\n— Zum-ba.", "— ¿Cuántos pelos tiene la cola de un caballo?\n— 30.583. Perdone profesor… pero esa ya es otra pregunta."]
+    /* Estilo para el botón de Streamlit para que parezca el de la captura */
+    .stButton > button {
+        display: block;
+        margin: 0 auto;
+        border-radius: 50px;
+        padding: 10px 30px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #1a1a1a;
+        font-size: 16px;
+    }
+    
+</style>""", unsafe_allow_html=True)
 
-# --- FUNCIÓN IA ---
-def respuesta_ia(mensaje_usuario, historial):
-    try:
-        mensajes_ia = [{"role": "system", "content": "Eres Luis, papá chileno de Ignacia. Cariñoso y orgulloso. Usa: 'bacán', 'se pasó', 'Pucha', 'Vivaldi', 'mi chiquitita'. 1-2 frases."}]
-        for m in historial[-5:]:
-            mensajes_ia.append(m)
-        mensajes_ia.append({"role": "user", "content": mensaje_usuario})
-        
-        completado = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=mensajes_ia,
-            max_tokens=150
-        )
-        return completado.choices[0].message.content
-    except Exception:
-        return "Pucha mi chiquitita, aquí está tu papi. No te preocupes, todo va a estar bien. ¡Vivaldi siempre!"
+if 'palabra_dia' not in st.session_state:
+    st.session_state.palabra_dia = random.choice(["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Chiquitita"])
 
-# --- INICIALIZACIÓN ---
-if "mensajes" not in st.session_state:
-    st.session_state.mensajes = []
-if "palabra" not in st.session_state:
-    st.session_state.palabra = random.choice(palabras)
+st.title(f"❤️ ¡Hola, mi Señora {st.session_state.palabra_dia}!")
 
-# SALUDO DINÁMICO
-st.title(f"❤️ ¡Hola, mi Señora {st.session_state.palabra}!")
-
-# --- 1. FOTO (ARRIBA) ---
+# FOTO Y ÁNIMO
 st.write("### 📸 Un recuerdo para hoy")
-animo = st.select_slider(label="¿Cómo se siente?", options=["Seleccione", "MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"])
-st.divider()
+animo = st.select_slider("¿Cómo te sientes?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
+urls_fotos = ["https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"]
+st.image(random.choice(urls_fotos), use_container_width=True)
 
-if animo != "Seleccione":
-    st.image(random.choice(urls_fotos), use_container_width=True)
-    if animo in ["FELIZ", "MUY FELIZ"]: st.balloons()
-else:
-    st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
+# --- SECCIÓN DE BOTONES CENTRADOS (Uno sobre otro) ---
+st.markdown("<div class='button-container'>", unsafe_allow_html=True)
 
-# --- 2. BOTONES CENTRADOS (WHATSAPP + CHISTE) ---
-st.markdown("<div class='centrar-flex'>", unsafe_allow_html=True)
-
-# WhatsApp Primero
+# Botón WhatsApp
 st.markdown(f"""
     <a href='https://wa.me/56992238085' class='whatsapp-btn'>
-        <img src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' width='24'>
+        <img src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' width='22'>
         HABLAR CON PAPI REAL
     </a>
 """, unsafe_allow_html=True)
 
-# Botón Chiste Segundo
-if st.button("🤡 ¡Cuéntame un chiste, Papi!"):
-    st.session_state.ultimo_chiste = random.choice(chistes_reales)
-
-if "ultimo_chiste" in st.session_state:
-    st.markdown(f'<div class="chiste-box">{st.session_state.ultimo_chiste}</div>', unsafe_allow_html=True)
+# Botón Chiste (Streamlit maneja el evento de click)
+if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
+    st.session_state.mostrar_chiste = True
+else:
+    if "mostrar_chiste" not in st.session_state:
+        st.session_state.mostrar_chiste = False
 
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- 3. CHAT CON PAPI (AL FINAL) ---
+if st.session_state.mostrar_chiste:
+    st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]))
+    st.session_state.mostrar_chiste = False
+
+# CHAT EVOLUTIVO
 st.divider()
-st.write("### 💬 Chat con Papi")
+st.write("### 💬 Chat con pAAPi") # Cambio de texto solicitado
 
-chat_placeholder = st.container()
-with chat_placeholder:
-    for m in st.session_state.mensajes:
-        with st.chat_message(m["role"]):
-            st.write(m["content"])
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-pregunta = st.chat_input("Escríbele a Papi...")
+for m in st.session_state.messages:
+    with st.chat_message(m["role"]): st.write(m["content"])
 
-if pregunta:
-    st.session_state.mensajes.append({"role": "user", "content": pregunta})
-    with chat_placeholder:
-        with st.chat_message("user"):
-            st.write(pregunta)
-        with st.chat_message("assistant"):
-            with st.spinner("Papi está escribiendo..."):
-                txt_ia = respuesta_ia(pregunta, st.session_state.mensajes)
-                st.write(txt_ia)
-                st.session_state.mensajes.append({"role": "assistant", "content": txt_ia})
-    st.rerun()
+if prompt := st.chat_input("Escríbele a pAAPi..."):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"): st.write(prompt)
+    with st.chat_message("assistant"):
+        respuesta = generar_respuesta_papi_v2(prompt)
+        st.write(respuesta)
+    st.session_state.messages.append({"role": "assistant", "content": respuesta})
