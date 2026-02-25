@@ -3,14 +3,35 @@ import random
 from openai import OpenAI
 
 # ==========================================
-# 1. CONFIGURACIÓN E INVENTARIO
+# 1. CONFIGURACIÓN E INVENTARIO (CHISTES Y SEÑORAS)
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
+# Listado de "Señoras" de Don Luis
 SENORAS = [
     "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", 
     "de la Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", 
     "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"
+]
+
+# Chistes oficiales del archivo docx 
+CHISTES = [
+    "— En Hawai uno no se hospeda, se aloha. [cite: 1]",
+    "— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo. — ¿Y el segundo lugar? — Kasitoko. [cite: 2]",
+    "— El otro día vi a un otaku triste y lo animé. [cite: 3]",
+    "— Ayer metí un libro de récords en la batidora y batí todos los récords. [cite: 4]",
+    "— ¿Qué le dice un pan a otro pan? — Te presento una miga. [cite: 5]",
+    "— Cuando estés triste abraza un zapato. — Un zapato consuela. [cite: 6]",
+    "— Una señora llorando llega a una zapatería: —¿Tiene zapatos de cocodrilo? —¿Qué número calza su cocodrilo? [cite: 7]",
+    "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo: — Game Over. [cite: 8]",
+    "— Un tipo va al oculista. — Mire la pared. — ¿Cuál pared? [cite: 9]",
+    "— Un español le pregunta a un inglés: —¿Cómo llaman a los bomberos? —Firemen. —Nosotros los llamamos por teléfono. [cite: 10]",
+    "— ¿Te sabes el chiste del tarro? — No. — ¡Qué lata! [cite: 11]",
+    "— Tengo un perro que dice 'Hola'. — En mi casa tengo un tarro que dice 'Nescafé'. [cite: 12]",
+    "— ¿Aló, está Joaco? — No, Joaco mprar. [cite: 13]",
+    "— ¿Qué le dijo un techo a otro techo? — Techo de menos. [cite: 14]",
+    "— ¿Qué hace una abeja en el gimnasio? — Zum-ba. [cite: 15]",
+    "— ¿Cuántos pelos tiene la cola de un caballo? — 30.583. —¿Y cómo lo sabes? —Perdone profesor… pero esa ya es otra pregunta. [cite: 16]"
 ]
 
 FOTOS_RANDOM = [
@@ -49,7 +70,7 @@ VIDEOS_RANDOM = [
 ]
 
 # ==========================================
-# 2. IA: ADN LUIS v7.1
+# 2. IA: ADN LUIS v8.0
 # ==========================================
 def generar_respuesta_papi(mensaje_usuario, historial):
     try:
@@ -57,10 +78,10 @@ def generar_respuesta_papi(mensaje_usuario, historial):
         prompt_sistema = """
         Eres Luis, papá de Ignacia Albornoz Osses. Chileno, tierno y respetuoso.
         - Habla siempre de USTED. Nunca tutees.
-        - Saluda como 'Mi Señora [Adjetivo]'.
-        - Contexto: Aída (mamá) es equipo; Tomás (tío) en Barcelona (Gudslip); Nona y Tata abuelos.
-        - Respuesta ante separación: 'A veces los papás no son pareja, pero siempre somos un equipo para cuidarte'.
-        - Trato: 'mi amorcito', 'hijita'. Pregunta: ¿Cómo está usted?
+        - Usa: 'mi amorcito', 'hijita'.
+        - Contexto: Aída (mamá) es equipo; Tomás (tío) en Barcelona (Gudslip).
+        - Si pregunta por qué no viven juntos: 'A veces los papás no son pareja, pero siempre somos un equipo para cuidarte'.
+        - Pregunta: ¿Cómo está usted?
         """
         mensajes = [{"role": "system", "content": prompt_sistema}]
         for m in historial[-4:]: mensajes.append(m)
@@ -68,13 +89,15 @@ def generar_respuesta_papi(mensaje_usuario, historial):
         response = client.chat.completions.create(model="gpt-4o-mini", messages=mensajes, temperature=0.6)
         return response.choices[0].message.content
     except:
-        return "Pucha mi amorcito, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
+        return "Pucha mi amorcito, la señal anda malita, pero aquí está su pAAPi."
 
 # ==========================================
 # 3. LÓGICA DE NAVEGACIÓN Y FIJACIÓN
 # ==========================================
-if "chat" in st.query_params:
+# USAMOS LA URL PARA MANTENER LA SESIÓN AL REFRESCAR
+if "acceso" in st.query_params or st.session_state.get("autenticado"):
     st.session_state.pagina = 'principal'
+    st.session_state.autenticado = True
 else:
     st.session_state.pagina = 'inicio'
 
@@ -90,8 +113,8 @@ if st.session_state.pagina == 'inicio':
     </style>""", unsafe_allow_html=True)
 
     if st.button("ENTRAR"):
-        st.query_params["chat"] = "true"
-        # FIJAMOS EL CONTENIDO AQUÍ PARA QUE NO CAMBIE AL APRETAR BOTONES
+        st.query_params["acceso"] = "vivaldi" # LLAVE DE SEGURIDAD
+        st.session_state.autenticado = True
         st.session_state.senora = random.choice(SENORAS)
         if random.random() > 0.5:
             st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
@@ -108,14 +131,13 @@ if st.session_state.pagina == 'inicio':
 else:
     st.markdown("""<style> [data-testid="stAppViewContainer"] { background-color: white !important; } </style>""", unsafe_allow_html=True)
 
-    # Si por alguna razón refresca y se pierden, los recuperamos una sola vez
     if 'senora' not in st.session_state: st.session_state.senora = random.choice(SENORAS)
-    if 'contenido' not in st.session_state: st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
+    if 'contenido' not in st.session_state: 
+        st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
 
     st.title(f"❤️ ¡Hola, mi Señora {st.session_state.senora}!")
     st.subheader("¿Cómo está usted?")
     
-    # El contenido se mantiene fijo porque está guardado en session_state
     if st.session_state.contenido["tipo"] == "foto":
         st.image(st.session_state.contenido["url"], use_container_width=True)
     else:
@@ -126,9 +148,8 @@ else:
     
     st.divider()
     
-    # Al apretar este botón, solo aparecerá el chiste abajo, sin cambiar la foto
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
-        st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga.", "— ¿Qué hace una abeja en el gimnasio? — ¡Zumba!"]))
+        st.info(random.choice(CHISTES)) # SELECCIÓN ALEATORIA DE SUS CHISTES
 
     st.write("### 💬 Chat con pAAPi")
     if "messages" not in st.session_state: st.session_state.messages = []
