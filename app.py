@@ -57,13 +57,23 @@ else:
     st.title(f"❤️ ¡Hola, mi {st.session_state.saludo}!")
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
     
-    # WhatsApp
     st.markdown('<a href="https://wa.me/56992238085" target="_blank" style="background-color: #25D366; color: white; padding: 15px; border-radius: 10px; text-decoration: none; display: block; text-align: center; font-weight: bold; margin-bottom: 20px;">📲 HABLAR CON PAPI REAL</a>', unsafe_allow_html=True)
 
-    # Chistes
     if st.button("🤡 ¡Papi, cuéntame un chiste!", key="joke"):
         st.info(random.choice(CHISTES))
 
     st.divider()
-    if "chat" not in st.session_state: st.session_state.chat = []
-    for m in st.session_state.
+    if "chat_msgs" not in st.session_state: st.session_state.chat_msgs = []
+    for m in st.session_state.chat_msgs:
+        with st.chat_message(m["role"]): st.markdown(m["content"])
+
+    if p := st.chat_input("Dime algo, mi amor..."):
+        st.session_state.chat_msgs.append({"role": "user", "content": p})
+        with st.chat_message("user"): st.markdown(p)
+        try:
+            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            res = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "system", "content": ADN_SISTEMA}] + st.session_state.chat_msgs)
+            r = res.choices[0].message.content
+        except: r = "Pucha mi amor, se cortó la señal..."
+        with st.chat_message("assistant"): st.markdown(r)
+        st.session_state.chat_msgs.append({"role": "assistant", "content": r})
