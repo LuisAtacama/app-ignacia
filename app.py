@@ -3,35 +3,29 @@ import random
 from openai import OpenAI
 
 # ==========================================
-# 1. CONFIGURACIÓN E INVENTARIO (CHISTES Y SEÑORAS)
+# 1. CONFIGURACIÓN E INVENTARIO
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
-# Listado de "Señoras" de Don Luis
-SENORAS = [
-    "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", 
-    "de la Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", 
-    "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"
-]
+SENORAS = ["Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", "de la Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"]
 
-# Chistes oficiales del archivo docx 
 CHISTES = [
-    "— En Hawai uno no se hospeda, se aloha. [cite: 1]",
-    "— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo. — ¿Y el segundo lugar? — Kasitoko. [cite: 2]",
-    "— El otro día vi a un otaku triste y lo animé. [cite: 3]",
-    "— Ayer metí un libro de récords en la batidora y batí todos los récords. [cite: 4]",
-    "— ¿Qué le dice un pan a otro pan? — Te presento una miga. [cite: 5]",
-    "— Cuando estés triste abraza un zapato. — Un zapato consuela. [cite: 6]",
-    "— Una señora llorando llega a una zapatería: —¿Tiene zapatos de cocodrilo? —¿Qué número calza su cocodrilo? [cite: 7]",
-    "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo: — Game Over. [cite: 8]",
-    "— Un tipo va al oculista. — Mire la pared. — ¿Cuál pared? [cite: 9]",
-    "— Un español le pregunta a un inglés: —¿Cómo llaman a los bomberos? —Firemen. —Nosotros los llamamos por teléfono. [cite: 10]",
-    "— ¿Te sabes el chiste del tarro? — No. — ¡Qué lata! [cite: 11]",
-    "— Tengo un perro que dice 'Hola'. — En mi casa tengo un tarro que dice 'Nescafé'. [cite: 12]",
-    "— ¿Aló, está Joaco? — No, Joaco mprar. [cite: 13]",
-    "— ¿Qué le dijo un techo a otro techo? — Techo de menos. [cite: 14]",
-    "— ¿Qué hace una abeja en el gimnasio? — Zum-ba. [cite: 15]",
-    "— ¿Cuántos pelos tiene la cola de un caballo? — 30.583. —¿Y cómo lo sabes? —Perdone profesor… pero esa ya es otra pregunta. [cite: 16]"
+    "— En Hawai uno no se hospeda,\n— se aloha.",
+    "— ¿Cómo se llama el campeón japonés de buceo?\n— Tokofondo.\n— ¿Y el segundo lugar?\n— Kasitoko.",
+    "— El otro día vi a un otaku triste\n— y lo animé.",
+    "— Ayer metí un libro de récords en la batidora\n— y batí todos los récords.",
+    "— ¿Qué le dice un pan a otro pan?\n— Te presento una miga.",
+    "— Cuando estés triste abraza un zapato.\n— Un zapato consuela.",
+    "— Una señora llorando llega a una zapatería:\n— ¿Tiene zapatos de cocodrilo?\n— ¿Qué número calza su cocodrilo?",
+    "— Había una vez un niñito llamado Nintendo, lo atropellaron y dijo:\n— Game Over.",
+    "— Un tipo va al oculista.\n— Mire la pared.\n— ¿Cuál pared?",
+    "— Un español le pregunta a un inglés:\n— ¿Cómo llaman a los bomberos?\n— Firemen.\n— Nosotros los llamamos por teléfono.",
+    "— ¿Te sabes el chiste del tarro?\n— No.\n— ¡Qué lata!",
+    "— Tengo un perro que dice 'Hola'.\n— En mi casa tengo un tarro que dice 'Nescafé'.",
+    "— ¿Aló, está Joaco?\n— No, Joaco mprar.",
+    "— ¿Qué le dijo un techo a otro techo?\n— Techo de menos.",
+    "— ¿Qué hace una abeja en el gimnasio?\n— Zum-ba.",
+    "— Te haré una última pregunta. Si la sabes, te apruebo.\n— ¿Cuántos pelos tiene la cola de un caballo?\n— 30.583.\n— ¿Y cómo lo sabes?\n— Perdone profesor… pero esa ya es otra pregunta."
 ]
 
 FOTOS_RANDOM = [
@@ -62,78 +56,92 @@ FOTOS_RANDOM = [
     "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
 ]
 
-VIDEOS_RANDOM = [
-    "https://youtu.be/sB-TdQKWMGI", "https://youtu.be/IBExxlSBbdE",
-    "https://youtu.be/4Bt2LytMb-o", "https://youtu.be/SLhpt5vxQIw",
-    "https://youtu.be/6Qz637nhLKc", "https://youtu.be/zBN-6NEGyzM",
-    "https://youtu.be/leAF95qMGCg", "https://youtu.be/Rgl4n3jWGCQ"
-]
+VIDEOS_RANDOM = ["https://youtu.be/sB-TdQKWMGI", "https://youtu.be/IBExxlSBbdE", "https://youtu.be/4Bt2LytMb-o", "https://youtu.be/SLhpt5vxQIw", "https://youtu.be/6Qz637nhLKc", "https://youtu.be/zBN-6NEGyzM", "https://youtu.be/leAF95qMGCg", "https://youtu.be/Rgl4n3jWGCQ"]
 
 # ==========================================
-# 2. IA: ADN LUIS v8.0
+# 2. IA: ADN LUIS v8.3 (CONTEXTO COMPLETO)
 # ==========================================
 def generar_respuesta_papi(mensaje_usuario, historial):
     try:
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+        
+        # AQUÍ ESTÁ TODO SU ARCHIVO VOLCADO PARA LA IA
         prompt_sistema = """
-        Eres Luis, papá de Ignacia Albornoz Osses. Chileno, tierno y respetuoso.
-        - Habla siempre de USTED. Nunca tutees.
-        - Usa: 'mi amorcito', 'hijita'.
-        - Contexto: Aída (mamá) es equipo; Tomás (tío) en Barcelona (Gudslip).
-        - Si pregunta por qué no viven juntos: 'A veces los papás no son pareja, pero siempre somos un equipo para cuidarte'.
-        - Pregunta: ¿Cómo está usted?
+        Eres Luis, el papá de Ignacia Albornoz Osses ("Ignacita"). Tu tono es tierno, protector y cercano.
+        
+        REGLAS DE ORO:
+        - Habla SIEMPRE de USTED. Nunca tutees a Ignacita.
+        - Usa apodos: 'mi amorcito', 'hijita', 'mi señora'.
+        - Eres chileno: usa un lenguaje natural, cálido y breve.
+
+        NÚCLEO FAMILIAR:
+        - Aída Osses Herrera: Es la mamá. Nos llevamos muy bien, con respeto y afecto. Somos un equipo para cuidarte.
+        - Tío Tomás: Mi hermano, vive en Barcelona, tiene la empresa 'Gudslip'. Muy cercano.
+        - Tío Claudio: Mi hermano en La Serena (relación neutral).
+        - Abuelos fallecidos (Paternos): Tatis Taimes y Abuelita Marta. La adoraban.
+        
+        FAMILIA MATERNA:
+        - Nona: Mamá de Aída.
+        - Tata Ignacio: Papá de Aída.
+        - Tío Nacho y Tía Ale: Padres de los primos Lautaro y Aynara.
+        
+        AMIGOS CLAVE:
+        - Tío Jean Paul Olhaberry: El mago/ilusionista, gran amigo mío.
+        - Sergio Aldunate: Gran amigo que te conoce desde pequeña.
+        - Sofía y Paz: Tus amigas de la infancia ("las niñas de la casa 6").
+        - Yoly: Amiga de Aída en Santiago.
+
+        SITUACIONES ESPECIALES:
+        - Si pregunta por qué no vivimos juntos: "A veces los papás no son pareja, pero siempre somos un equipo para cuidarte".
+        - Evita conflictos. Si menciona a Claudio, mantén neutralidad.
         """
+        
         mensajes = [{"role": "system", "content": prompt_sistema}]
-        for m in historial[-4:]: mensajes.append(m)
+        for m in historial[-6:]: mensajes.append(m)
         mensajes.append({"role": "user", "content": mensaje_usuario})
-        response = client.chat.completions.create(model="gpt-4o-mini", messages=mensajes, temperature=0.6)
+        
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=mensajes,
+            temperature=0.7
+        )
         return response.choices[0].message.content
     except:
-        return "Pucha mi amorcito, la señal anda malita, pero aquí está su pAAPi."
+        return "Pucha mi amorcito, la señal anda malita, pero aquí está su pAAPi que la adora."
 
 # ==========================================
-# 3. LÓGICA DE NAVEGACIÓN Y FIJACIÓN
+# 3. LÓGICA DE NAVEGACIÓN
 # ==========================================
-# USAMOS LA URL PARA MANTENER LA SESIÓN AL REFRESCAR
 if "acceso" in st.query_params or st.session_state.get("autenticado"):
     st.session_state.pagina = 'principal'
     st.session_state.autenticado = True
 else:
     st.session_state.pagina = 'inicio'
 
-# --- PANTALLA DE INICIO ---
 if st.session_state.pagina == 'inicio':
     st.markdown("""<style>
         [data-testid="stAppViewContainer"] { background-color: black !important; }
         .portada-wrapper { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; display: flex; align-items: center; justify-content: center; z-index: 999; }
         .video-gif { max-width: 100%; max-height: 100%; object-fit: contain; }
         .logo-sobre { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70%; max-width: 350px; animation: emerger 2.5s ease-out forwards; }
-        @keyframes emerger { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+        @keyframes emerger { 0% { opacity: 0; transform: scale(0.6); } 100% { opacity: 1; transform: scale(1); } }
         .stButton button { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; opacity: 0; z-index: 1000; cursor: pointer; }
     </style>""", unsafe_allow_html=True)
 
     if st.button("ENTRAR"):
-        st.query_params["acceso"] = "vivaldi" # LLAVE DE SEGURIDAD
+        st.query_params["acceso"] = "vivaldi"
         st.session_state.autenticado = True
         st.session_state.senora = random.choice(SENORAS)
-        if random.random() > 0.5:
-            st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
-        else:
-            st.session_state.contenido = {"tipo": "video", "url": random.choice(VIDEOS_RANDOM)}
+        st.session_state.contenido = random.choice([{"tipo": "foto", "url": f} for f in FOTOS_RANDOM] + [{"tipo": "video", "url": v} for v in VIDEOS_RANDOM])
         st.rerun()
 
-    st.markdown(f"""<div class="portada-wrapper">
-        <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-gif">
-        <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-sobre">
-    </div>""", unsafe_allow_html=True)
+    st.markdown(f'<div class="portada-wrapper"><img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-gif"><img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-sobre"></div>', unsafe_allow_html=True)
 
-# --- PANTALLA PRINCIPAL ---
 else:
     st.markdown("""<style> [data-testid="stAppViewContainer"] { background-color: white !important; } </style>""", unsafe_allow_html=True)
 
     if 'senora' not in st.session_state: st.session_state.senora = random.choice(SENORAS)
-    if 'contenido' not in st.session_state: 
-        st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
+    if 'contenido' not in st.session_state: st.session_state.contenido = {"tipo": "foto", "url": FOTOS_RANDOM[0]}
 
     st.title(f"❤️ ¡Hola, mi Señora {st.session_state.senora}!")
     st.subheader("¿Cómo está usted?")
@@ -149,7 +157,7 @@ else:
     st.divider()
     
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
-        st.info(random.choice(CHISTES)) # SELECCIÓN ALEATORIA DE SUS CHISTES
+        st.info(random.choice(CHISTES))
 
     st.write("### 💬 Chat con pAAPi")
     if "messages" not in st.session_state: st.session_state.messages = []
