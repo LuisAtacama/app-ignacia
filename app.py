@@ -10,12 +10,14 @@ from openai import OpenAI
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
-# Inicializar el estado de la página si no existe
+# Inicializar estados para que no se pierdan al refrescar
 if 'pagina' not in st.session_state:
     st.session_state.pagina = 'inicio'
+if 'saludo' not in st.session_state:
+    st.session_state.saludo = ""
 
 # ==========================================
-# 2. IA: ADN LUIS v5.2 (Usted y Naturalidad)
+# 2. IA: ADN LUIS v5.4 (Trato de Usted y Naturalidad)
 # ==========================================
 def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
     try:
@@ -30,6 +32,7 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         REGLA CRÍTICA: No repita el mismo apodo en la misma respuesta. 
         Si usa 'Si mi amorcito dígame', no agregue más apodos.
         PROHIBIDO: 'amor' solo, 'mi vida', 'Ignacia' solo.
+        PREGUNTA CLAVE: Use siempre '¿Cómo está usted?' o '¿Cómo va todo?'.
         ESTILO: Breve, cálido, chileno. MODO: {modo}.
         """
         
@@ -52,7 +55,6 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
 
 # --- PANTALLA DE INICIO (PORTADA) ---
 if st.session_state.pagina == 'inicio':
-    # CSS para que la portada ocupe todo y sea negra
     st.markdown("""
         <style>
             [data-testid="stAppViewContainer"] { background-color: black !important; }
@@ -61,17 +63,19 @@ if st.session_state.pagina == 'inicio':
                 background: black; display: flex; align-items: center; justify-content: center;
                 z-index: 999; overflow: hidden;
             }
-            .video-gif { width: 100%; height: 100%; object-fit: contain; }
+            .video-gif { 
+                max-width: 100%; max-height: 100%; 
+                object-fit: contain; 
+            }
             .logo-sobre {
                 position: absolute; top: 50%; left: 50%;
-                transform: translate(-50%, -50%); width: 70%; max-width: 400px;
+                transform: translate(-50%, -50%); width: 70%; max-width: 350px;
                 animation: emerger 2.5s ease-out forwards;
             }
             @keyframes emerger {
                 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
                 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             }
-            /* Botón invisible que cubre todo */
             .stButton > button {
                 position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
                 opacity: 0; z-index: 1000; cursor: pointer;
@@ -79,12 +83,14 @@ if st.session_state.pagina == 'inicio':
         </style>
     """, unsafe_allow_html=True)
 
-    # El botón invisible para entrar
     if st.button("ENTRAR", key="boton_portada"):
+        opciones = ["hijita", "ignacita", "mi chiquitita", "mi amorcito"]
+        elegido = random.choice(opciones)
+        # CORRECCIÓN: "Usted" en lugar de "se encuentra"
+        st.session_state.saludo = f"❤️ ¡Hola, {elegido}! ¿Cómo está usted?"
         st.session_state.pagina = 'principal'
         st.rerun()
 
-    # Visual de la portada
     st.markdown(f"""
         <div class="portada-wrapper">
             <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-gif">
@@ -94,7 +100,6 @@ if st.session_state.pagina == 'inicio':
 
 # --- PANTALLA PRINCIPAL (CHAT) ---
 else:
-    # Resetear el fondo a blanco y permitir scroll
     st.markdown("""
         <style>
             [data-testid="stAppViewContainer"] { background-color: white !important; }
@@ -102,10 +107,10 @@ else:
         </style>
     """, unsafe_allow_html=True)
 
-    if 'saludo' not in st.session_state:
-        st.session_state.saludo = f"❤️ ¡Hola, mi {random.choice(['hijita', 'mi amorcito', 'mi chiquitita'])}! ¿Cómo está usted?"
-
+    # Mostrar saludo generado
     st.title(st.session_state.saludo)
+    
+    # CORRECCIÓN: "¿Cómo se siente usted?"
     animo = st.select_slider("¿Cómo se siente usted?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
     
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
