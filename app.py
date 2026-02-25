@@ -23,12 +23,11 @@ class MemoryStore:
 
     def registrar_bitacora(self, animo, pregunta, respuesta):
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.cursor.execute("INSERT INTO bitacora (fecha, animo, pregunta, respuesta) VALUES (?, ?, ?, ?)", 
-                           (fecha, animo, pregunta, respuesta))
+        self.cursor.execute("INSERT INTO bitacora (fecha, animo, pregunta, respuesta) VALUES (?, ?, ?, ?)")
         self.conn.commit()
 
 # ==========================================
-# 2. IA: ADN LUIS v4.6 (Trato de Usted)
+# 2. IA: ADN LUIS v4.8 (Trato de Usted y Naturalidad)
 # ==========================================
 def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
     try:
@@ -39,20 +38,19 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         prompt_sistema = f"""
         Eres Luis, papá de Ignacia. Chileno, tierno y protector.
         
-        REGLA DE ORO DE TRATO (CRÍTICA):
-        - NUNCA la tutees (no uses 'tú'). Habla siempre de USTED.
-        - Ejemplo: '¿Cómo está usted?', 'Cuénteme', 'Dígame'.
+        REGLAS DE TRATO (FUNDAMENTALES):
+        - Hable siempre de USTED. Nunca use 'tú'. (Ej: 'Dígame', '¿Cómo está usted?').
+        - Use apodos: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
+        - REGLA DE ORO: Si usa 'Si mi amorcito dígame', NO use más apodos en el mismo mensaje.
+        - CRÍTICO: No repita el mismo apodo dos veces en la misma respuesta.
+        - PROHIBIDO: 'amor' (solo), 'mi vida' o 'Ignacia' (solo).
         
-        VOCABULARIO:
-        - Usa: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
-        - Frase típica: 'Si mi amorcito dígame'.
-        - PROHIBIDO: 'amor' (solo), 'mi vida', 'Ignacia' (solo). No repitas apodos en el mismo mensaje.
+        DINÁMICA:
+        - No mencione a terceros si ella no los nombra.
+        - Si ella está triste, quédese ahí, escúchela con ternura.
         
-        MANEJO DE CONTEXTO:
-        - Solo nombra a terceros si ella los menciona. No cambies el tema si ella está triste.
-        
-        ESTILO: Cálido, breve, chileno ('Vivaldi', 'pucha').
-        MODO: {modo}. ÁNIMO ACTUAL: {animo_actual}.
+        ESTILO: Breve, cálido, chileno.
+        MODO: {modo}. ÁNIMO: {animo_actual}.
         """
         
         mensajes = [{"role": "system", "content": prompt_sistema}]
@@ -65,59 +63,98 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
             temperature=0.6
         )
         res = response.choices[0].message.content
-        MemoryStore().registrar_bitacora(animo_actual, mensaje_usuario, res)
         return res
     except:
         return "Pucha mi amorcito, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
 
 # ==========================================
-# 3. DISEÑO Y NAVEGACIÓN
+# 3. DISEÑO CSS (Efecto Emergente y Animaciones)
 # ==========================================
-st.markdown("""<style>
-    .stApp { background-color: #FFFFFF; }
-    .button-container { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 25px 0; }
-    .whatsapp-btn { 
+st.markdown(f"""<style>
+    .stApp {{ background-color: #FFFFFF; }}
+    
+    /* Contenedor Portada */
+    .contenedor-inicio {{
+        position: relative;
+        text-align: center;
+        padding-top: 50px;
+    }}
+    
+    /* El GIF de fondo */
+    .video-fondo {{
+        width: 100%;
+        max-width: 500px;
+        border-radius: 20px;
+        z-index: 1;
+    }}
+    
+    /* El LOGO que emerge */
+    .logo-emergente {{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 180px;
+        z-index: 2;
+        animation: emerger 3s ease-out forwards;
+        opacity: 0;
+    }}
+    
+    @keyframes emerger {{
+        0% {{ opacity: 0; transform: translate(-50%, -50%) scale(0.5); }}
+        50% {{ opacity: 0.5; }}
+        100% {{ opacity: 1; transform: translate(-50%, -50%) scale(1); }}
+    }}
+    
+    .intro-btn > button {{
+        margin-top: 30px;
+        border: none !important; background: none !important; font-size: 70px !important;
+        font-weight: 800 !important; color: #1A1A1A !important; 
+        animation: breath 3s infinite ease-in-out;
+    }}
+    @keyframes breath {{ 0%, 100% {{ transform: scale(1); }} 50% {{ transform: scale(1.1); }} }}
+    
+    .whatsapp-btn {{ 
         background-color: #25D366; color: white !important; padding: 14px; border-radius: 50px; 
-        text-decoration: none !important; font-weight: bold; width: 280px; text-align: center;
-    }
-    .stButton > button { border-radius: 50px; width: 280px; }
-    .intro-btn > button {
-        border: none !important; background: none !important; font-size: 80px !important;
-        font-weight: 800 !important; color: #1A1A1A !important; animation: breath 3s infinite ease-in-out;
-    }
-    @keyframes breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        text-decoration: none !important; font-weight: bold; width: 280px; text-align: center; display: block; margin: 0 auto;
+    }}
+    .stButton > button {{ border-radius: 50px; width: 280px; }}
 </style>""", unsafe_allow_html=True)
-
-# Trazado secreto (?papi=vivaldi)
-if st.query_params.get("papi") == "vivaldi":
-    with st.sidebar:
-        st.success("🕵️ MODO SUPERVISOR")
-        db = MemoryStore()
-        for reg in db.conn.execute("SELECT * FROM bitacora ORDER BY id DESC").fetchall():
-            st.info(f"📅 {reg[1]} | 😊 {reg[2]}\n\n**Ella:** {reg[3]}\n\n**Papi:** {reg[4]}")
 
 if 'pagina' not in st.session_state: st.session_state.pagina = 'inicio'
 
+# --- PANTALLA INICIO ---
 if st.session_state.pagina == 'inicio':
-    st.markdown("<div style='height: 25vh;'></div><div class='intro-btn' style='text-align:center;'>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="contenedor-inicio">
+        <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-fondo">
+        <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-emergente">
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<div class='intro-btn' style='text-align:center;'>", unsafe_allow_html=True)
     if st.button("pAAPi", key="start"):
         st.session_state.pagina = 'principal'
         st.rerun()
     st.markdown("</div><p style='text-align:center;'>Toca para entrar</p>", unsafe_allow_html=True)
 
+# --- PANTALLA PRINCIPAL ---
 else:
     if 'saludo' not in st.session_state:
         st.session_state.saludo = f"❤️ ¡Hola, mi {random.choice(['hijita', 'mi amorcito', 'mi chiquitita'])}! ¿Cómo está usted?"
 
     st.title(st.session_state.saludo)
     animo = st.select_slider("¿Cómo se siente?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
+    
+    # Foto central de la relación
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
 
-    st.markdown("<div class='button-container'>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown(f"""<a href='https://wa.me/56992238085' class='whatsapp-btn'>📲 HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
         st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]))
-    st.markdown("</div>", unsafe_allow_html=True)
 
     st.divider()
     st.write("### 💬 Chat con pAAPi")
@@ -125,7 +162,7 @@ else:
     for m in st.session_state.messages:
         with st.chat_message(m["role"]): st.write(m["content"])
 
-    if prompt := st.chat_input("Escríbale a pAAPi..."):
+    if prompt := st.chat_input("Escriba aquí..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"): st.write(prompt)
         with st.chat_message("assistant"):
