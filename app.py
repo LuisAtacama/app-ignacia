@@ -3,13 +3,18 @@ import random
 from openai import OpenAI
 
 # ==========================================
-# 1. CONFIGURACIÓN Y LISTADO DE CONTENIDO
+# 1. CONFIGURACIÓN Y CONTEXTO FAMILIAR
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
-ADJETIVOS = ["Inteligente", "Valiente", "Bella", "Artista", "Genia", "Poderosa", "Decidida", "Encantadora", "Brillante", "Única"]
+# Listado oficial de "Señoras" de Don Luis
+SENORAS = [
+    "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", 
+    "de la Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", 
+    "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"
+]
 
-# Galería de fotos
+# Fotos y Videos
 FOTOS_RANDOM = [
     "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg",
     "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg",
@@ -38,7 +43,6 @@ FOTOS_RANDOM = [
     "https://i.postimg.cc/htpLtGZc/IMG-5496.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"
 ]
 
-# Lista de videos de YouTube
 VIDEOS_RANDOM = [
     "https://youtu.be/sB-TdQKWMGI", "https://youtu.be/IBExxlSBbdE",
     "https://youtu.be/4Bt2LytMb-o", "https://youtu.be/SLhpt5vxQIw",
@@ -47,12 +51,22 @@ VIDEOS_RANDOM = [
 ]
 
 # ==========================================
-# 2. IA: ADN LUIS v6.4
+# 2. IA: ADN LUIS v7.0 (Contexto Total)
 # ==========================================
 def generar_respuesta_papi(mensaje_usuario, historial):
     try:
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        prompt_sistema = "Eres Luis, papá de Ignacia. Chileno, tierno. Habla siempre de USTED. Nunca tutees. Usa apodos como mi amorcito o hijita. Pregunta ¿Cómo está usted?"
+        # Inyectamos todo el contexto familiar de Don Luis
+        prompt_sistema = """
+        Eres Luis, papá de Ignacia Albornoz Osses. Chileno, tierno y respetuoso.
+        REGLAS DE ORO:
+        - Habla siempre de USTED. Nunca tutees.
+        - Saluda como 'Mi Señora [Adjetivo]' usando la lista de Don Luis.
+        - Contexto Familiar: Aída (mamá) es parte de tu equipo; Tomás (tío) en Barcelona con Gudslip; 
+          Nona y Tata son los abuelos maternos; Sofía y Paz son las amigas de la casa 6.
+        - Si pregunta por qué no viven juntos: 'A veces los papás no son pareja, pero siempre somos un equipo para cuidarte'.
+        - Trato: 'mi amorcito', 'hijita'. Pregunta: ¿Cómo está usted?
+        """
         mensajes = [{"role": "system", "content": prompt_sistema}]
         for m in historial[-4:]: mensajes.append(m)
         mensajes.append({"role": "user", "content": mensaje_usuario})
@@ -82,12 +96,11 @@ if st.session_state.pagina == 'inicio':
 
     if st.button("ENTRAR"):
         st.query_params["chat"] = "true"
-        st.session_state.adjetivo = random.choice(ADJETIVOS)
-        # Decidir si mostrar foto o video
+        st.session_state.senora = random.choice(SENORAS)
         if random.random() > 0.5:
-            st.session_state.contenido_actual = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
+            st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
         else:
-            st.session_state.contenido_actual = {"tipo": "video", "url": random.choice(VIDEOS_RANDOM)}
+            st.session_state.contenido = {"tipo": "video", "url": random.choice(VIDEOS_RANDOM)}
         st.rerun()
 
     st.markdown(f"""<div class="portada-wrapper">
@@ -99,23 +112,27 @@ if st.session_state.pagina == 'inicio':
 else:
     st.markdown("""<style> [data-testid="stAppViewContainer"] { background-color: white !important; } </style>""", unsafe_allow_html=True)
 
-    if 'adjetivo' not in st.session_state: st.session_state.adjetivo = random.choice(ADJETIVOS)
-    if 'contenido_actual' not in st.session_state:
-        st.session_state.contenido_actual = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
+    # Cada vez que refresca, cambia la Señora y la foto/video
+    st.session_state.senora = random.choice(SENORAS)
+    st.session_state.contenido = random.choice([{"tipo":"foto","url":random.choice(FOTOS_RANDOM)}, {"tipo":"video","url":random.choice(VIDEOS_RANDOM)}])
 
-    st.title(f"❤️ ¡Hola, mi Señora {st.session_state.adjetivo}!")
+    st.title(f"❤️ ¡Hola, mi Señora {st.session_state.senora}!")
     st.subheader("¿Cómo está usted?")
     
-    # Mostrar Foto o Video según lo elegido
-    if st.session_state.contenido_actual["tipo"] == "foto":
-        st.image(st.session_state.contenido_actual["url"], use_container_width=True)
+    if st.session_state.contenido["tipo"] == "foto":
+        st.image(st.session_state.contenido["url"], use_container_width=True)
     else:
-        st.video(st.session_state.contenido_actual["url"])
+        st.video(st.session_state.contenido["url"])
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown(f"""<a href='https://wa.me/56992238085' target='_blank' style='background-color: #25D366; color: white; padding: 14px; border-radius: 50px; text-decoration: none; font-weight: bold; width: 100%; max-width: 300px; text-align: center; display: block; margin: 0 auto;'>📲 HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
     
     st.divider()
+    
+    if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
+        st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga.", "— ¿Qué hace una abeja en el gimnasio? — ¡Zumba!"]))
+
+    st.write("### 💬 Chat con pAAPi")
     if "messages" not in st.session_state: st.session_state.messages = []
     for m in st.session_state.messages:
         with st.chat_message(m["role"]): st.write(m["content"])
