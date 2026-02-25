@@ -6,29 +6,16 @@ from datetime import datetime
 from openai import OpenAI
 
 # ==========================================
-# 1. CONFIGURACIÓN Y BITÁCORA
+# 1. CONFIGURACIÓN INICIAL
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
-class MemoryStore:
-    def __init__(self):
-        self.conn = sqlite3.connect('papi_memory.db', check_same_thread=False)
-        self.cursor = self.conn.cursor()
-        self.setup()
-
-    def setup(self):
-        self.cursor.execute('''CREATE TABLE IF NOT EXISTS bitacora 
-                             (id INTEGER PRIMARY KEY, fecha TEXT, animo TEXT, pregunta TEXT, respuesta TEXT)''')
-        self.conn.commit()
-
-    def registrar_bitacora(self, animo, pregunta, respuesta):
-        fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.cursor.execute("INSERT INTO bitacora (fecha, animo, pregunta, respuesta) VALUES (?, ?, ?, ?)", 
-                           (fecha, animo, pregunta, respuesta))
-        self.conn.commit()
+# Inicializar el estado de la página si no existe
+if 'pagina' not in st.session_state:
+    st.session_state.pagina = 'inicio'
 
 # ==========================================
-# 2. IA: ADN LUIS v5.0 (Usted y Naturalidad)
+# 2. IA: ADN LUIS v5.2 (Usted y Naturalidad)
 # ==========================================
 def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
     try:
@@ -55,79 +42,66 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
             messages=mensajes,
             temperature=0.6
         )
-        res = response.choices[0].message.content
-        MemoryStore().registrar_bitacora(animo_actual, mensaje_usuario, res)
-        return res
+        return response.choices[0].message.content
     except:
         return "Pucha mi amorcito, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
 
 # ==========================================
-# 3. DISEÑO CSS (Portada Limpia y Responsiva)
+# 3. LÓGICA DE PANTALLAS
 # ==========================================
-st.markdown("""<style>
-    .stApp { background-color: #FFFFFF; }
-    
-    /* Contenedor que ocupa toda la pantalla y es clickeable */
-    .btn-portada {
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        z-index: 999;
-        border: none;
-        background: black;
-        padding: 0;
-        cursor: pointer;
-    }
 
-    .video-fondo {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        position: absolute;
-        top: 0; left: 0;
-    }
-
-    .logo-emergente {
-        position: absolute;
-        top: 50%; left: 50%;
-        transform: translate(-50%, -50%);
-        width: 65%;
-        max-width: 350px;
-        z-index: 1000;
-        animation: emerger 2.5s ease-out forwards;
-    }
-
-    @keyframes emerger {
-        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
-        100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    }
-
-    /* Escondemos el botón real de Streamlit pero lo dejamos funcional */
-    .stButton button {
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        opacity: 0; z-index: 1001;
-    }
-</style>""", unsafe_allow_html=True)
-
-if 'pagina' not in st.session_state: st.session_state.pagina = 'inicio'
-
-# --- PANTALLA INICIO ---
+# --- PANTALLA DE INICIO (PORTADA) ---
 if st.session_state.pagina == 'inicio':
-    # El botón invisible que captura el toque en toda la pantalla
-    if st.button("ENTRAR", key="boton_entrada"):
-        st.session_state.pagina = 'principal'
-        st.rerun()
-    
-    # Lo que se ve (Video + Logo)
-    st.markdown(f"""
-    <div class="btn-portada">
-        <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-fondo">
-        <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-emergente">
-    </div>
+    # CSS para que la portada ocupe todo y sea negra
+    st.markdown("""
+        <style>
+            [data-testid="stAppViewContainer"] { background-color: black !important; }
+            .portada-wrapper {
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: black; display: flex; align-items: center; justify-content: center;
+                z-index: 999; overflow: hidden;
+            }
+            .video-gif { width: 100%; height: 100%; object-fit: contain; }
+            .logo-sobre {
+                position: absolute; top: 50%; left: 50%;
+                transform: translate(-50%, -50%); width: 70%; max-width: 400px;
+                animation: emerger 2.5s ease-out forwards;
+            }
+            @keyframes emerger {
+                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+                100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            }
+            /* Botón invisible que cubre todo */
+            .stButton > button {
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                opacity: 0; z-index: 1000; cursor: pointer;
+            }
+        </style>
     """, unsafe_allow_html=True)
 
-# --- PANTALLA PRINCIPAL ---
+    # El botón invisible para entrar
+    if st.button("ENTRAR", key="boton_portada"):
+        st.session_state.pagina = 'principal'
+        st.rerun()
+
+    # Visual de la portada
+    st.markdown(f"""
+        <div class="portada-wrapper">
+            <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-gif">
+            <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-sobre">
+        </div>
+    """, unsafe_allow_html=True)
+
+# --- PANTALLA PRINCIPAL (CHAT) ---
 else:
+    # Resetear el fondo a blanco y permitir scroll
+    st.markdown("""
+        <style>
+            [data-testid="stAppViewContainer"] { background-color: white !important; }
+            .main { overflow-y: auto !important; }
+        </style>
+    """, unsafe_allow_html=True)
+
     if 'saludo' not in st.session_state:
         st.session_state.saludo = f"❤️ ¡Hola, mi {random.choice(['hijita', 'mi amorcito', 'mi chiquitita'])}! ¿Cómo está usted?"
 
@@ -137,20 +111,25 @@ else:
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(f"""<a href='https://wa.me/56992238085' style='background-color: #25D366; color: white; padding: 14px; border-radius: 50px; text-decoration: none; font-weight: bold; width: 280px; text-align: center; display: block; margin: 0 auto;'>📲 HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
+    st.markdown(f"""<a href='https://wa.me/56992238085' target='_blank' style='background-color: #25D366; color: white; padding: 14px; border-radius: 50px; text-decoration: none; font-weight: bold; width: 100%; max-width: 300px; text-align: center; display: block; margin: 0 auto;'>📲 HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
     
     st.divider()
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
         st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]))
 
     st.write("### 💬 Chat con pAAPi")
-    if "messages" not in st.session_state: st.session_state.messages = []
+    
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    
     for m in st.session_state.messages:
-        with st.chat_message(m["role"]): st.write(m["content"])
+        with st.chat_message(m["role"]):
+            st.write(m["content"])
 
     if prompt := st.chat_input("Escriba aquí..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"): st.write(prompt)
+        with st.chat_message("user"):
+            st.write(prompt)
         with st.chat_message("assistant"):
             respuesta = generar_respuesta_papi_v4(prompt, animo, st.session_state.messages)
             st.write(respuesta)
