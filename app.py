@@ -28,7 +28,7 @@ class MemoryStore:
         self.conn.commit()
 
 # ==========================================
-# 2. IA: ADN LUIS v4.9 (Usted y Naturalidad)
+# 2. IA: ADN LUIS v5.0 (Usted y Naturalidad)
 # ==========================================
 def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
     try:
@@ -38,14 +38,11 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
 
         prompt_sistema = f"""
         Eres Luis, papá de Ignacia. Chileno, tierno y protector.
-        
-        REGLA DE ORO:
-        - Hable siempre de USTED. Nunca use 'tú'.
-        - Use apodos: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
-        - No repita el mismo apodo dos veces en la misma respuesta.
-        - Si usa 'Si mi amorcito dígame', no agregue más apodos.
-        - PROHIBIDO: 'amor' a secas, 'mi vida', 'Ignacia' a secas.
-        
+        REGLA DE ORO: Hable siempre de USTED. Nunca use 'tú'.
+        APODOS: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
+        REGLA CRÍTICA: No repita el mismo apodo en la misma respuesta. 
+        Si usa 'Si mi amorcito dígame', no agregue más apodos.
+        PROHIBIDO: 'amor' solo, 'mi vida', 'Ignacia' solo.
         ESTILO: Breve, cálido, chileno. MODO: {modo}.
         """
         
@@ -62,71 +59,70 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         MemoryStore().registrar_bitacora(animo_actual, mensaje_usuario, res)
         return res
     except:
-        return "Pucha mi amorcito, la señal anda malita, pero aquí está su pAAPi. ¡Vivaldi!"
+        return "Pucha mi amorcito, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
 
 # ==========================================
-# 3. DISEÑO CSS (Responsivo y Entrada Táctil)
+# 3. DISEÑO CSS (Portada Limpia y Responsiva)
 # ==========================================
-st.markdown(f"""<style>
-    /* Fondo general */
-    .stApp {{ background-color: #FFFFFF; }}
-
-    /* Contenedor de Portada Responsivo */
-    .portada-full {{
+st.markdown("""<style>
+    .stApp { background-color: #FFFFFF; }
+    
+    /* Contenedor que ocupa toda la pantalla y es clickeable */
+    .btn-portada {
         position: fixed;
         top: 0; left: 0; width: 100vw; height: 100vh;
         z-index: 999;
-        background-color: black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
+        border: none;
+        background: black;
+        padding: 0;
         cursor: pointer;
-    }}
+    }
 
-    .video-fondo {{
-        position: absolute;
+    .video-fondo {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* Esto lo hace responsivo para PC y Celular */
-        z-index: 1;
-    }}
+        object-fit: cover;
+        position: absolute;
+        top: 0; left: 0;
+    }
 
-    .logo-emergente {{
-        position: relative;
-        width: 60%;
-        max-width: 300px;
-        z-index: 2;
-        animation: emerger 3s ease-out forwards;
-        opacity: 0;
-    }}
+    .logo-emergente {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 65%;
+        max-width: 350px;
+        z-index: 1000;
+        animation: emerger 2.5s ease-out forwards;
+    }
 
-    @keyframes emerger {{
-        0% {{ opacity: 0; transform: scale(0.5); }}
-        100% {{ opacity: 1; transform: scale(1); }}
-    }}
+    @keyframes emerger {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+        100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
 
-    /* Ocultar elementos de Streamlit en la portada */
-    .stButton {{ display: none; }}
+    /* Escondemos el botón real de Streamlit pero lo dejamos funcional */
+    .stButton button {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        opacity: 0; z-index: 1001;
+    }
 </style>""", unsafe_allow_html=True)
 
 if 'pagina' not in st.session_state: st.session_state.pagina = 'inicio'
 
-# --- PANTALLA INICIO (Tocar para entrar) ---
+# --- PANTALLA INICIO ---
 if st.session_state.pagina == 'inicio':
-    # Creamos un botón invisible que ocupa toda la pantalla
-    if st.button("ENTRAR_INVISIBLE", key="overlay"):
+    # El botón invisible que captura el toque en toda la pantalla
+    if st.button("ENTRAR", key="boton_entrada"):
         st.session_state.pagina = 'principal'
         st.rerun()
     
-    # Visual de la portada
+    # Lo que se ve (Video + Logo)
     st.markdown(f"""
-    <div class="portada-full" onclick="document.querySelector('button[kind=secondary]').click();">
+    <div class="btn-portada">
         <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-fondo">
         <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-emergente">
-        <div style="position: absolute; bottom: 10%; color: white; z-index: 3; font-family: sans-serif; opacity: 0.7;">
-            Toca en cualquier parte para entrar
-        </div>
     </div>
     """, unsafe_allow_html=True)
 
