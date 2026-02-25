@@ -6,19 +6,17 @@ from datetime import datetime
 from openai import OpenAI
 
 # ==========================================
-# 1. CONFIGURACIÓN Y BITÁCORA (DB) - REPARADO
+# 1. CONFIGURACIÓN Y BITÁCORA (DB)
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
 class MemoryStore:
     def __init__(self):
-        # Conexión a la base de datos para el trazado de Don Luis
         self.conn = sqlite3.connect('papi_memory.db', check_same_thread=False)
         self.cursor = self.conn.cursor()
         self.setup()
 
     def setup(self):
-        # Aseguramos que la tabla de la bitácora exista (reparando lo borrado)
         self.cursor.execute('''CREATE TABLE IF NOT EXISTS bitacora 
                              (id INTEGER PRIMARY KEY, fecha TEXT, animo TEXT, pregunta TEXT, respuesta TEXT)''')
         self.conn.commit()
@@ -30,7 +28,7 @@ class MemoryStore:
         self.conn.commit()
 
 # ==========================================
-# 2. IA: ADN LUIS v4.5 (Sin repeticiones)
+# 2. IA: ADN LUIS v4.6 (Trato de Usted)
 # ==========================================
 def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
     try:
@@ -41,18 +39,20 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         prompt_sistema = f"""
         Eres Luis, papá de Ignacia. Chileno, tierno y protector.
         
-        REGLAS DE VOCABULARIO (NATURALIDAD):
-        - Usa apodos variados: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
-        - REGLA CRÍTICA: Nunca repitas el mismo apodo dos veces en una sola respuesta.
-        - Si usas la frase 'Si mi amorcito dígame', NO agregues ningún otro apodo en el resto del mensaje.
-        - PROHIBIDO: 'amor' (solo), 'mi vida' o 'Ignacia' (solo).
+        REGLA DE ORO DE TRATO (CRÍTICA):
+        - NUNCA la tutees (no uses 'tú'). Habla siempre de USTED.
+        - Ejemplo: '¿Cómo está usted?', 'Cuénteme', 'Dígame'.
+        
+        VOCABULARIO:
+        - Usa: 'hijita', 'ignacita', 'mi chiquitita', 'mi amorcito'.
+        - Frase típica: 'Si mi amorcito dígame'.
+        - PROHIBIDO: 'amor' (solo), 'mi vida', 'Ignacia' (solo). No repitas apodos en el mismo mensaje.
         
         MANEJO DE CONTEXTO:
-        - Solo nombra a personas (Aída, Sofía, etc.) si ella las menciona primero.
-        - Si ella dice que está 'mal', quédate ahí con ella. No cambies de tema.
+        - Solo nombra a terceros si ella los menciona. No cambies el tema si ella está triste.
         
-        ESTILO: Breve, cálido, chileno ('Vivaldi', 'pucha'). Habla como un papá, no como un robot.
-        MODO: {modo}. ÁNIMO: {animo_actual}.
+        ESTILO: Cálido, breve, chileno ('Vivaldi', 'pucha').
+        MODO: {modo}. ÁNIMO ACTUAL: {animo_actual}.
         """
         
         mensajes = [{"role": "system", "content": prompt_sistema}]
@@ -62,16 +62,16 @@ def generar_respuesta_papi_v4(mensaje_usuario, animo_actual, historial):
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=mensajes,
-            temperature=0.6 # Temperatura más baja para evitar repeticiones robóticas
+            temperature=0.6
         )
         res = response.choices[0].message.content
         MemoryStore().registrar_bitacora(animo_actual, mensaje_usuario, res)
         return res
     except:
-        return "Pucha mi amorcito, algo pasó con la señal, pero aquí está tu pAAPi. ¡Vivaldi!"
+        return "Pucha mi amorcito, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
 
 # ==========================================
-# 3. DISEÑO CSS
+# 3. DISEÑO Y NAVEGACIÓN
 # ==========================================
 st.markdown("""<style>
     .stApp { background-color: #FFFFFF; }
@@ -88,7 +88,7 @@ st.markdown("""<style>
     @keyframes breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 </style>""", unsafe_allow_html=True)
 
-# Trazado secreto por URL (?papi=vivaldi)
+# Trazado secreto (?papi=vivaldi)
 if st.query_params.get("papi") == "vivaldi":
     with st.sidebar:
         st.success("🕵️ MODO SUPERVISOR")
@@ -98,7 +98,6 @@ if st.query_params.get("papi") == "vivaldi":
 
 if 'pagina' not in st.session_state: st.session_state.pagina = 'inicio'
 
-# --- PANTALLA INICIO ---
 if st.session_state.pagina == 'inicio':
     st.markdown("<div style='height: 25vh;'></div><div class='intro-btn' style='text-align:center;'>", unsafe_allow_html=True)
     if st.button("pAAPi", key="start"):
@@ -106,34 +105,27 @@ if st.session_state.pagina == 'inicio':
         st.rerun()
     st.markdown("</div><p style='text-align:center;'>Toca para entrar</p>", unsafe_allow_html=True)
 
-# --- PANTALLA PRINCIPAL ---
 else:
     if 'saludo' not in st.session_state:
-        st.session_state.saludo = f"❤️ ¡Hola, mi {random.choice(['hijita', 'mi amorcito', 'mi chiquitita'])}!"
+        st.session_state.saludo = f"❤️ ¡Hola, mi {random.choice(['hijita', 'mi amorcito', 'mi chiquitita'])}! ¿Cómo está usted?"
 
     st.title(st.session_state.saludo)
-    animo = st.select_slider("¿Cómo te sientes?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
-    
-    # FOTO
+    animo = st.select_slider("¿Cómo se siente?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
     st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
 
-    # BOTONES (Chistes y WhatsApp)
     st.markdown("<div class='button-container'>", unsafe_allow_html=True)
     st.markdown(f"""<a href='https://wa.me/56992238085' class='whatsapp-btn'>📲 HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
-    
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
-        chistes = ["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]
-        st.info(random.choice(chistes))
+        st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]))
     st.markdown("</div>", unsafe_allow_html=True)
 
-    # CHAT
     st.divider()
     st.write("### 💬 Chat con pAAPi")
     if "messages" not in st.session_state: st.session_state.messages = []
     for m in st.session_state.messages:
         with st.chat_message(m["role"]): st.write(m["content"])
 
-    if prompt := st.chat_input("Escríbele a pAAPi..."):
+    if prompt := st.chat_input("Escríbale a pAAPi..."):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"): st.write(prompt)
         with st.chat_message("assistant"):
