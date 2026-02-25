@@ -3,18 +3,16 @@ import random
 from openai import OpenAI
 
 # ==========================================
-# 1. CONFIGURACIÓN Y CONTEXTO FAMILIAR
+# 1. CONFIGURACIÓN E INVENTARIO
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
-# Listado oficial de "Señoras" de Don Luis
 SENORAS = [
     "Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", 
     "de la Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", 
     "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"
 ]
 
-# Fotos y Videos
 FOTOS_RANDOM = [
     "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/44tnYt9r/ignacita-alegria-primer-oso.jpg",
     "https://i.postimg.cc/50wjj79Q/IMG-5005.jpg", "https://i.postimg.cc/zBn33tDg/IMG-5018.jpg",
@@ -51,20 +49,17 @@ VIDEOS_RANDOM = [
 ]
 
 # ==========================================
-# 2. IA: ADN LUIS v7.0 (Contexto Total)
+# 2. IA: ADN LUIS v7.1
 # ==========================================
 def generar_respuesta_papi(mensaje_usuario, historial):
     try:
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        # Inyectamos todo el contexto familiar de Don Luis
         prompt_sistema = """
         Eres Luis, papá de Ignacia Albornoz Osses. Chileno, tierno y respetuoso.
-        REGLAS DE ORO:
         - Habla siempre de USTED. Nunca tutees.
-        - Saluda como 'Mi Señora [Adjetivo]' usando la lista de Don Luis.
-        - Contexto Familiar: Aída (mamá) es parte de tu equipo; Tomás (tío) en Barcelona con Gudslip; 
-          Nona y Tata son los abuelos maternos; Sofía y Paz son las amigas de la casa 6.
-        - Si pregunta por qué no viven juntos: 'A veces los papás no son pareja, pero siempre somos un equipo para cuidarte'.
+        - Saluda como 'Mi Señora [Adjetivo]'.
+        - Contexto: Aída (mamá) es equipo; Tomás (tío) en Barcelona (Gudslip); Nona y Tata abuelos.
+        - Respuesta ante separación: 'A veces los papás no son pareja, pero siempre somos un equipo para cuidarte'.
         - Trato: 'mi amorcito', 'hijita'. Pregunta: ¿Cómo está usted?
         """
         mensajes = [{"role": "system", "content": prompt_sistema}]
@@ -76,7 +71,7 @@ def generar_respuesta_papi(mensaje_usuario, historial):
         return "Pucha mi amorcito, algo pasó con la señal, pero aquí está su pAAPi. ¡Vivaldi!"
 
 # ==========================================
-# 3. LÓGICA DE NAVEGACIÓN
+# 3. LÓGICA DE NAVEGACIÓN Y FIJACIÓN
 # ==========================================
 if "chat" in st.query_params:
     st.session_state.pagina = 'principal'
@@ -96,6 +91,7 @@ if st.session_state.pagina == 'inicio':
 
     if st.button("ENTRAR"):
         st.query_params["chat"] = "true"
+        # FIJAMOS EL CONTENIDO AQUÍ PARA QUE NO CAMBIE AL APRETAR BOTONES
         st.session_state.senora = random.choice(SENORAS)
         if random.random() > 0.5:
             st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
@@ -112,13 +108,14 @@ if st.session_state.pagina == 'inicio':
 else:
     st.markdown("""<style> [data-testid="stAppViewContainer"] { background-color: white !important; } </style>""", unsafe_allow_html=True)
 
-    # Cada vez que refresca, cambia la Señora y la foto/video
-    st.session_state.senora = random.choice(SENORAS)
-    st.session_state.contenido = random.choice([{"tipo":"foto","url":random.choice(FOTOS_RANDOM)}, {"tipo":"video","url":random.choice(VIDEOS_RANDOM)}])
+    # Si por alguna razón refresca y se pierden, los recuperamos una sola vez
+    if 'senora' not in st.session_state: st.session_state.senora = random.choice(SENORAS)
+    if 'contenido' not in st.session_state: st.session_state.contenido = {"tipo": "foto", "url": random.choice(FOTOS_RANDOM)}
 
     st.title(f"❤️ ¡Hola, mi Señora {st.session_state.senora}!")
     st.subheader("¿Cómo está usted?")
     
+    # El contenido se mantiene fijo porque está guardado en session_state
     if st.session_state.contenido["tipo"] == "foto":
         st.image(st.session_state.contenido["url"], use_container_width=True)
     else:
@@ -129,6 +126,7 @@ else:
     
     st.divider()
     
+    # Al apretar este botón, solo aparecerá el chiste abajo, sin cambiar la foto
     if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
         st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga.", "— ¿Qué hace una abeja en el gimnasio? — ¡Zumba!"]))
 
