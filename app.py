@@ -1,17 +1,13 @@
 import streamlit as st
 import random
 from openai import OpenAI
-# --- NUEVAS LIBRERÍAS PARA LA BITÁCORA ---
-from streamlit_gsheets import GSheetsConnection
-import pandas as pd
-from datetime import datetime
 
 # ==========================================
 # 1. CONFIGURACIÓN E INVENTARIO (SEGÚN SUS ARCHIVOS)
 # ==========================================
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
-# [cite_start]Listado oficial de "Señoras" [cite: 17]
+# Listado oficial de "Señoras" [cite: 17]
 SENORAS = ["Loquita", "Molita", "Dinosauria", "Cuadernita", "Matemáticas", "de la Lota", "Monopoly", "Pepinosky", "Bebidosky", "Loutita", "Pokercita", "Nadadorcita", "Nintendita", "Kirbicita"]
 
 # Chistes con saltos de línea y sin citaciones técnicas 
@@ -31,60 +27,37 @@ FOTOS_RANDOM = ["https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.p
 
 VIDEOS_RANDOM = ["https://youtu.be/sB-TdQKWMGI", "https://youtu.be/IBExxlSBbdE", "https://youtu.be/4Bt2LytMb-o", "https://youtu.be/SLhpt5vxQIw", "https://youtu.be/6Qz637nhLKc", "https://youtu.be/zBN-6NEGyzM", "https://youtu.be/leAF95qMGCg", "https://youtu.be/Rgl4n3jWGCQ"]
 
-# --- CONEXIÓN A LA BITÁCORA ---
-try:
-    conn = st.connection("gsheets", type=GSheetsConnection)
-except Exception:
-    conn = None
-
-def guardar_en_bitacora(pregunta, respuesta):
-    if conn:
-        try:
-            # Leer datos actuales
-            df = conn.read()
-            # Nueva entrada
-            nueva_fila = pd.DataFrame([{
-                "Fecha": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-                "Pregunta": pregunta,
-                "Respuesta": respuesta
-            }])
-            # Concatenar y actualizar
-            updated_df = pd.concat([df, nueva_fila], ignore_index=True)
-            conn.update(data=updated_df)
-        except Exception:
-            pass
-
 # ==========================================
-# [cite_start]2. IA: ADN LUIS v9.0 (CONTEXTO INTEGRAL) [cite: 17-56]
+# 2. IA: ADN LUIS v9.0 (CONTEXTO INTEGRAL) [cite: 17-56]
 # ==========================================
 def generar_respuesta_papi(mensaje_usuario, historial):
     try:
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
         # Aquí volcamos TODO el contenido de su archivo Word
         prompt_sistema = """
-        [cite_start]Eres Luis, el papá de Ignacia Albornoz Osses ("Ignacita"). Tu tono es tierno, protector y cercano[cite: 19, 24].
+        Eres Luis, el papá de Ignacia Albornoz Osses ("Ignacita"). Tu tono es tierno, protector y cercano[cite: 19, 24].
         REGLAS DE ORO:
         - Habla SIEMPRE de USTED. Nunca tutees.
         - Eres chileno: usa un lenguaje natural, cálido y breve.
         
         NÚCLEO FAMILIAR:
-        - Aída Osses Herrera: Es la mamá. Se llevan muy bien, con respeto y afecto. [cite_start]Son un equipo para cuidarla[cite: 23, 27, 29, 54].
-        - [cite_start]Tío Tomás Ignacio: Tu hermano cercano en Barcelona, de la empresa 'Gudslip'[cite: 34, 35].
-        - [cite_start]Tatis Taimes y Abuelita Marta: Tus padres (abuelos fallecidos) que la adoraban profundamente[cite: 36, 37].
-        - [cite_start]Tío Claudio: Tu hermano en La Serena (neutralidad)[cite: 32, 53].
+        - Aída Osses Herrera: Es la mamá. Se llevan muy bien, con respeto y afecto. Son un equipo para cuidarla[cite: 23, 27, 29, 54].
+        - Tío Tomás Ignacio: Tu hermano cercano en Barcelona, de la empresa 'Gudslip'[cite: 34, 35].
+        - Tatis Taimes y Abuelita Marta: Tus padres (abuelos fallecidos) que la adoraban profundamente[cite: 36, 37].
+        - Tío Claudio: Tu hermano en La Serena (neutralidad)[cite: 32, 53].
         
         FAMILIA MATERNA:
-        - [cite_start]Nona (Aída) y Tata Ignacio: Abuelos maternos muy cariñosos[cite: 39, 40].
-        - [cite_start]Tío Nacho, Tía Ale, y los primos adolescentes Lautaro y Aynara[cite: 41, 42, 43].
+        - Nona (Aída) y Tata Ignacio: Abuelos maternos muy cariñosos[cite: 39, 40].
+        - Tío Nacho, Tía Ale, y los primos adolescentes Lautaro y Aynara[cite: 41, 42, 43].
         
         AMISTADES:
-        - [cite_start]Sofía y Paz: Vecinas de la infancia ("niñas de la casa 6")[cite: 45].
-        - [cite_start]Tío Jean Paul Olhaberry: Ilusionista y gran amigo tuyo[cite: 48].
-        - [cite_start]Sergio Aldunate: Gran amigo de siempre[cite: 49].
-        - [cite_start]Yoly: Amiga de Aída en Santiago[cite: 46].
+        - Sofía y Paz: Vecinas de la infancia ("niñas de la casa 6")[cite: 45].
+        - Tío Jean Paul Olhaberry: Ilusionista y gran amigo tuyo[cite: 48].
+        - Sergio Aldunate: Gran amigo de siempre[cite: 49].
+        - Yoly: Amiga de Aída en Santiago[cite: 46].
 
         SI PREGUNTA POR QUÉ NO VIVEN JUNTOS:
-        - [cite_start]"A veces los papás no son pareja, pero siempre somos un equipo para cuidarte"[cite: 55].
+        - "A veces los papás no son pareja, pero siempre somos un equipo para cuidarte"[cite: 55].
         """
         
         mensajes = [{"role": "system", "content": prompt_sistema}]
@@ -156,28 +129,8 @@ else:
         with st.chat_message(m["role"]): st.write(m["content"])
 
     if prompt := st.chat_input("Escriba aquí..."):
-        # LÓGICA DE ADMINISTRACIÓN SECRETA
-        if prompt.lower() == "ver bitacora":
-            st.session_state.admin_mode = True
-        else:
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"): st.write(prompt)
-            
-            respuesta = generar_respuesta_papi(prompt, st.session_state.messages)
-            
-            with st.chat_message("assistant"):
-                st.write(respuesta)
-                st.session_state.messages.append({"role": "assistant", "content": respuesta})
-                
-            # GUARDAR AUTOMÁTICAMENTE EN GOOGLE SHEETS
-            guardar_en_bitacora(prompt, respuesta)
-
-    if st.session_state.get("admin_mode"):
-        st.divider()
-        st.write("### 🛠️ Panel de Administración")
-        if st.button("Cerrar Admin"):
-            st.session_state.admin_mode = False
-            st.rerun()
-        st.write("**Historial de esta sesión:**")
-        for i, msg in enumerate(st.session_state.messages):
-            st.text(f"{i+1}. {msg['role'].upper()}: {msg['content']}")
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"): st.write(prompt)
+        respuesta = generar_respuesta_papi(prompt, st.session_state.messages)
+        with st.chat_message("assistant"): st.write(respuesta)
+        st.session_state.messages.append({"role": "assistant", "content": respuesta})
