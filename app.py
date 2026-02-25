@@ -3,10 +3,10 @@ import random
 from openai import OpenAI
 import pandas as pd
 
-# 1. CONFIGURACIÓN (Inmediata)
+# 1. CONFIGURACIÓN (Inmediata y obligatoria)
 st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
 
-# 2. DISEÑO CSS (PORTADA NEGRA)
+# 2. DISEÑO CSS (Portada negra y botones internos)
 st.markdown("""
     <style>
     .stApp { background-color: white; }
@@ -15,81 +15,41 @@ st.markdown("""
         background: black; display: flex; align-items: center; justify-content: center; z-index: 999;
     }
     .logo-sobre { position: absolute; width: 80%; max-width: 500px; z-index: 1000; pointer-events: none; }
-    .stButton > button {
+    
+    /* Botón invisible de portada */
+    .btn-invisible > button {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: transparent !important; border: none !important; color: transparent !important;
         z-index: 9999; cursor: pointer;
     }
-    .btn-interno button {
-        position: relative !important; width: 100% !important; height: auto !important;
-        background-color: #f0f2f6 !important; color: black !important; opacity: 1 !important;
-        z-index: 1 !important;
+    
+    /* Botones internos reales */
+    .stButton > button {
+        border-radius: 10px;
+        font-weight: bold;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. LÓGICA DE NAVEGACIÓN (Sin esperas)
-if "entrado" not in st.session_state:
-    st.session_state.entrado = False
+# 3. FUNCIÓN DE CARGA (Protegida)
+@st.cache_data(show_spinner=False)
+def cargar_datos_seguros():
+    n, c, b = ["Mi Señora"], ["¿Qué le dice un pan a otro pan? Te presento una miga."], "Eres el papá de Ignacita."
+    try:
+        url_base = st.secrets["connections"]["gsheets"]["spreadsheet"].split('/edit')[0] + "/"
+        n = pd.read_csv(f"{url_base}export?format=csv&sheet=Senoras").iloc[:, 0].dropna().tolist()
+        c = pd.read_csv(f"{url_base}export?format=csv&sheet=Chistes").iloc[:, 0].dropna().tolist()
+        b = " ".join(pd.read_csv(f"{url_base}export?format=csv&sheet=Contexto").iloc[:, 0].dropna().astype(str).tolist())
+    except:
+        pass
+    return n, c, b
 
-if not st.session_state.entrado:
-    # --- PORTADA INSTANTÁNEA ---
+# 4. LÓGICA DE ESTADOS
+if "autenticado" not in st.session_state:
+    st.session_state.autenticado = False
+
+if not st.session_state.autenticado:
+    # --- PORTADA ---
     st.markdown(f'''
         <div class="portada-negra">
-            <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" style="height:100%">
-            <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-sobre">
-        </div>
-    ''', unsafe_allow_html=True)
-    
-    if st.button("ENTRAR"):
-        st.session_state.entrado = True
-        st.rerun()
-else:
-    # --- CARGA DE DATOS (Solo ocurre una vez dentro) ---
-    @st.cache_data(ttl=600)
-    def cargar_datos_internos():
-        n, c, b = ["Mi Señora"], ["¿Qué le dice un pan a otro pan? Te presento una miga."], "Eres el papá de Ignacita."
-        try:
-            url = st.secrets["connections"]["gsheets"]["spreadsheet"].split('/edit')[0] + "/"
-            n = pd.read_csv(f"{url}export?format=csv&sheet=Senoras").iloc[:, 0].dropna().tolist()
-            c = pd.read_csv(f"{url}export?format=csv&sheet=Chistes").iloc[:, 0].dropna().tolist()
-            b = " ".join(pd.read_csv(f"{url}export?format=csv&sheet=Contexto").iloc[:, 0].dropna().astype(str).tolist())
-        except: pass
-        return n, c, b
-
-    APODOS, BROMAS, ADN_IA = cargar_datos_internos()
-    
-    if "saludo_act" not in st.session_state:
-        st.session_state.saludo_act = random.choice(APODOS)
-
-    # --- INTERIOR LIMPIO ---
-    st.title(f"❤️ ¡Hola, mi {st.session_state.saludo_act}!")
-    st.image("https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", use_container_width=True)
-    
-    # WhatsApp
-    st.markdown('<a href="https://wa.me/56992238085" target="_blank" style="background-color: #25D366; color: white; padding: 15px; border-radius: 10px; text-decoration: none; display: block; text-align: center; font-weight: bold; margin-bottom: 20px;">📲 HABLAR CON PAPI REAL</a>', unsafe_allow_html=True)
-
-    # Chistes
-    st.markdown('<div class="btn-interno">', unsafe_allow_html=True)
-    if st.button("🤡 ¡Papi, cuéntame un chiste!"):
-        st.info(random.choice(BROMAS))
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.divider()
-    if "hist" not in st.session_state: st.session_state.hist = []
-    for m in st.session_state.hist:
-        with st.chat_message(m["role"]): st.markdown(m["content"])
-
-    if p := st.chat_input("Dime algo, mi amor..."):
-        st.session_state.hist.append({"role": "user", "content": p})
-        with st.chat_message("user"): st.markdown(p)
-        try:
-            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-            res = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "system", "content": ADN_IA}] + st.session_state.hist
-            )
-            r = res.choices[0].message.content
-        except: r = "Pucha mi amor, se me cortó la señal..."
-        with st.chat_message("assistant"): st.markdown(r)
-        st.session_state.hist.append({"role": "assistant", "content": r})
+            <img src="
