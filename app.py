@@ -32,74 +32,21 @@ class MemoryStore:
         return [row[0] for row in self.cursor.fetchall()]
 
 # ==========================================
-# 2. MOTOR EMOCIONAL CON RUTINA HORARIA
-# ==========================================
-class EmotionEngine:
-    def __init__(self):
-        if 'state' not in st.session_state:
-            st.session_state.state = {
-                "mode": "cariño",
-                "emotion": {"ternura": 9, "proteccion": 8, "orgullo": 6, "humor": 6, "estructura": 6, "ansiedad_suave": 2, "energia": 7, "poesia": 5}
-            }
-
-    def update_by_context(self, tags):
-        s = st.session_state.state
-        ahora = datetime.now().hour
-        
-        if ahora >= 21 or ahora <= 6:
-            s["mode"] = "cierre_noche"
-            s["emotion"]["ternura"] = 10
-            s["emotion"]["energia"] = 3
-            s["emotion"]["poesia"] = 8
-        elif "viaje_transporte" in tags:
-            s["mode"] = "logistica"
-            s["emotion"]["proteccion"] += 2
-        elif "logro" in tags:
-            s["mode"] = "celebracion"
-            s["emotion"]["orgullo"] += 3
-        elif "problema" in tags:
-            s["mode"] = "contencion"
-            s["emotion"]["ternura"] += 2
-        
-        for k in s["emotion"]:
-            s["emotion"][k] = max(0, min(10, s["emotion"][k]))
-
-def classify_context(text):
-    t = text.lower()
-    tags = []
-    if any(k in t for k in ["avión", "vuelo", "bus", "llegue", "uber", "furgón"]): tags.append("viaje_transporte")
-    if any(k in t for k in ["saqué", "gané", "logré", "7", "6", "bien"]): tags.append("logro")
-    if any(k in t for k in ["triste", "miedo", "mal", "lloré", "pelea"]): tags.append("problema")
-    if any(k in t for k in ["noche", "dormir", "sueño", "chao"]): tags.append("cierre_noche")
-    return tags
-
-# ==========================================
-# 3. GENERADOR ADN v2.0
+# 2. IA Y PERSONALIDAD
 # ==========================================
 def generar_respuesta_papi_v2(mensaje_usuario):
     try:
         client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-        tags = classify_context(mensaje_usuario)
-        
-        engine = EmotionEngine()
-        engine.update_by_context(tags)
-        
         db = MemoryStore()
         recuerdos = db.get_recent()
-        if tags: db.add_episode(mensaje_usuario, tags)
+        ahora = datetime.now().hour
+        modo = "cierre_noche" if (ahora >= 21 or ahora <= 6) else "cariño"
 
         prompt_sistema = f"""
-        Eres Luis, el papá real de Ignacia. Chileno, tierno y protector.
-        MODO ACTUAL: {st.session_state.state['mode']}
-        ADN:
-        - Usa diminutivos ('hijita', 'niñita').
-        - Si el modo es 'cierre_noche': Sé muy dulce, desea dulces sueños, di que descanse.
-        - Si el modo es 'celebracion': ¡Siiiii! ¡Esoooo! Qué orgullo.
-        - Errores humanos: Alguna letra alargada ('Aaaa que biennnn').
-        - RECUERDOS RECIENTES: {recuerdos}
-        - ESTADO EMOCIONAL: {json.dumps(st.session_state.state['emotion'])}
+        Eres Luis, el papá de Ignacia. Chileno, tierno, protector.
+        MODO ACTUAL: {modo}. RECUERDOS: {recuerdos}.
+        ADN: Usa diminutivos ('hijita'), celebra logros, valida emociones.
         """
-
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "system", "content": prompt_sistema}, {"role": "user", "content": mensaje_usuario}],
@@ -107,24 +54,51 @@ def generar_respuesta_papi_v2(mensaje_usuario):
         )
         return response.choices[0].message.content
     except:
-        return "Pucha mi chiquitita, la señal anda malita, pero te amo infinito. ¡Vivaldi siempre!"
+        return "Pucha mi chiquitita, algo pasó con la señal, pero te amo infinito. ¡Vivaldi!"
 
 # ==========================================
-# 4. INTERFAZ (UI) - DISEÑO MEJORADO
+# 3. DISEÑO CSS AVANZADO (PANTALLA INICIO)
 # ==========================================
 st.markdown("""<style>
+    /* Fondo de la app */
     .stApp { background-color: #FFFFFF; }
-    h1 { text-align: center; color: #1a1a1a; font-weight: 700; margin-bottom: 0px; }
-    h3 { text-align: center; color: #4a4a4a; margin-top: 10px; }
-    
-    /* Contenedor de botones centrados */
-    .button-container {
+
+    /* Pantalla de Inicio Centrada */
+    .intro-full {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 12px; /* Separación leve entre botones */
-        margin: 25px 0;
+        height: 70vh;
+        text-align: center;
+    }
+
+    /* Estilo del texto/botón pAAPi */
+    .paapi-logo {
+        font-family: 'Inter', sans-serif;
+        font-size: 80px;
+        font-weight: 800;
+        color: #1A1A1A;
+        letter-spacing: -2px;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        animation: breath 3s infinite ease-in-out;
+        user-select: none;
+    }
+
+    @keyframes breath {
+        0% { transform: scale(1); opacity: 0.8; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.8; }
+    }
+
+    /* Contenedor de botones principales */
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        margin: 30px 0;
     }
     
     .whatsapp-btn { 
@@ -137,11 +111,10 @@ st.markdown("""<style>
         display: inline-flex; 
         align-items: center; 
         gap: 10px;
-        font-size: 16px;
-        box-shadow: 0 4px 10px rgba(37, 211, 102, 0.2);
+        width: 280px; 
+        justify-content: center;
     }
 
-    /* Estilo para el botón de Streamlit para que parezca el de la captura */
     .stButton > button {
         display: block;
         margin: 0 auto;
@@ -150,60 +123,84 @@ st.markdown("""<style>
         border: 1px solid #ddd;
         background-color: white;
         color: #1a1a1a;
-        font-size: 16px;
+        width: 280px;
     }
-    
 </style>""", unsafe_allow_html=True)
 
-if 'palabra_dia' not in st.session_state:
-    st.session_state.palabra_dia = random.choice(["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente", "Chiquitita"])
+# ==========================================
+# 4. LÓGICA DE NAVEGACIÓN
+# ==========================================
+if 'pagina' not in st.session_state:
+    st.session_state.pagina = 'inicio'
 
-st.title(f"❤️ ¡Hola, mi Señora {st.session_state.palabra_dia}!")
+# --- PANTALLA DE INICIO ---
+if st.session_state.pagina == 'inicio':
+    st.markdown("<div class='intro-full'>", unsafe_allow_html=True)
+    
+    # El texto pAAPi actúa como botón
+    if st.button("pAAPi", key="btn_inicio", help="Toca para entrar"):
+        st.session_state.pagina = 'principal'
+        st.rerun()
+    
+    # Sobrescribimos el estilo del botón específico de inicio para que parezca solo texto
+    st.markdown("""<style>
+        div.stButton > button[kind="secondary"] {
+            border: none !important;
+            background: none !important;
+            font-size: 80px !important;
+            font-weight: 800 !important;
+            color: #1A1A1A !important;
+            height: auto !important;
+            width: auto !important;
+            animation: breath 3s infinite ease-in-out;
+        }
+        div.stButton > button:hover { color: #FF4B4B !important; }
+    </style>""", unsafe_allow_html=True)
+    
+    st.write("Toca para entrar")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# FOTO Y ÁNIMO
-st.write("### 📸 Un recuerdo para hoy")
-animo = st.select_slider("¿Cómo te sientes?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
-urls_fotos = ["https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"]
-st.image(random.choice(urls_fotos), use_container_width=True)
-
-# --- SECCIÓN DE BOTONES CENTRADOS (Uno sobre otro) ---
-st.markdown("<div class='button-container'>", unsafe_allow_html=True)
-
-# Botón WhatsApp
-st.markdown(f"""
-    <a href='https://wa.me/56992238085' class='whatsapp-btn'>
-        <img src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' width='22'>
-        HABLAR CON PAPI REAL
-    </a>
-""", unsafe_allow_html=True)
-
-# Botón Chiste (Streamlit maneja el evento de click)
-if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
-    st.session_state.mostrar_chiste = True
+# --- PANTALLA PRINCIPAL ---
 else:
-    if "mostrar_chiste" not in st.session_state:
+    if 'palabra_dia' not in st.session_state:
+        st.session_state.palabra_dia = random.choice(["Artista", "Fotógrafa", "Repostera", "Inteligente", "Valiente"])
+
+    st.title(f"❤️ ¡Hola, mi Señora {st.session_state.palabra_dia}!")
+
+    # FOTO Y ÁNIMO
+    st.write("### 📸 Un recuerdo para hoy")
+    animo = st.select_slider("¿Cómo te sientes?", options=["MUY TRISTE", "TRISTE", "NORMAL", "FELIZ", "MUY FELIZ"], value="NORMAL")
+    urls_fotos = ["https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg", "https://i.postimg.cc/VsBKnzd0/Gemini-Generated-Image-dvkezpdvkezpdvke.png"]
+    st.image(random.choice(urls_fotos), use_container_width=True)
+
+    # BOTONES
+    st.markdown("<div class='button-container'>", unsafe_allow_html=True)
+    st.markdown(f"""<a href='https://wa.me/56992238085' class='whatsapp-btn'><img src='https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' width='22'>HABLAR CON PAPI REAL</a>""", unsafe_allow_html=True)
+    
+    if st.button("🤡 ¡Cuéntame un chiste, pAAPi!!"):
+        st.session_state.mostrar_chiste = True
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    if st.session_state.get('mostrar_chiste'):
+        st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— Robinson Crusoe y lo atropellaron."]))
         st.session_state.mostrar_chiste = False
 
-st.markdown("</div>", unsafe_allow_html=True)
+    # CHAT
+    st.divider()
+    st.write("### 💬 Chat con pAAPi")
+    if "messages" not in st.session_state: st.session_state.messages = []
+    for m in st.session_state.messages:
+        with st.chat_message(m["role"]): st.write(m["content"])
 
-if st.session_state.mostrar_chiste:
-    st.info(random.choice(["— ¿Cómo se llama el campeón japonés de buceo? — Tokofondo.", "— ¿Qué le dice un pan a otro? — Te presento una miga."]))
-    st.session_state.mostrar_chiste = False
+    if prompt := st.chat_input("Escríbele a pAAPi..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"): st.write(prompt)
+        with st.chat_message("assistant"):
+            respuesta = generar_respuesta_papi_v2(prompt)
+            st.write(respuesta)
+        st.session_state.messages.append({"role": "assistant", "content": respuesta})
 
-# CHAT EVOLUTIVO
-st.divider()
-st.write("### 💬 Chat con pAAPi") # Cambio de texto solicitado
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-for m in st.session_state.messages:
-    with st.chat_message(m["role"]): st.write(m["content"])
-
-if prompt := st.chat_input("Escríbele a pAAPi..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"): st.write(prompt)
-    with st.chat_message("assistant"):
-        respuesta = generar_respuesta_papi_v2(prompt)
-        st.write(respuesta)
-    st.session_state.messages.append({"role": "assistant", "content": respuesta})
+    # Botón discreto para volver
+    if st.sidebar.button("🏠 Salir"):
+        st.session_state.pagina = 'inicio'
+        st.rerun()
