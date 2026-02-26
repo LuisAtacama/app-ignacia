@@ -3,10 +3,10 @@ import random
 from openai import OpenAI
 import os
 
-# 1. CONFIGURACIÓN
-st.set_page_config(page_title="pAAPi - Ignacia Edition", page_icon="🎀", layout="centered")
+# 1. CONFIGURACIÓN INICIAL
+st.set_page_config(page_title="pAAPi", page_icon="🎀", layout="centered")
 
-# 2. FUNCIÓN DE LECTURA LIMPIA
+# 2. FUNCIÓN DE LECTURA LIMPIA (El Escudo)
 def leer_archivo_limpio(nombre, es_adn=False):
     ruta = os.path.join(os.path.dirname(__file__), nombre)
     try:
@@ -18,112 +18,100 @@ def leer_archivo_limpio(nombre, es_adn=False):
                 if es_adn: return texto.strip()
                 return [line.strip() for line in texto.split('\n') if line.strip()]
     except: pass
-    return "Eres Luis, el papá de Ignacita." if es_adn else ["Dinosauria"]
+    return "Eres Luis, el papá de Ignacita." if es_adn else []
 
-ADN_SISTEMA_BASE = leer_archivo_limpio("adn.txt", es_adn=True)
+# CARGA DE DATOS
+ADN_SISTEMA = leer_archivo_limpio("adn.txt", es_adn=True)
 APODOS = leer_archivo_limpio("senoras.txt")
 LISTA_CHISTES = leer_archivo_limpio("chistes.txt")
+LISTA_FOTOS = leer_archivo_limpio("fotos.txt")
+LISTA_VIDEOS = leer_archivo_limpio("videos.txt")
 
-# REFUERZO DE PERSONALIDAD: Obligamos a la IA a recordar que habla con SU HIJA
-ADN_REFORZADO = f"""
-{ADN_SISTEMA_BASE}
-
-INSTRUCCIÓN CRUCIAL: Estás hablando DIRECTAMENTE con tu hija Ignacita (o sus apodos de señora). 
-NUNCA respondas como si hablaras con Luis. Luis eres TÚ (el narrador). 
-Usa frases como "mi amor", "hijita", "mi vida". 
-Si ella pregunta por alguien, responde: "Es tu tío...", "Es tu abuela...", "Es amigo de tu papá (yo)".
-"""
-
-# 3. LÓGICA DE NAVEGACIÓN (Persistencia mejorada)
+# 3. LÓGICA DE NAVEGACIÓN
 if "entrado" not in st.session_state:
     st.session_state.entrado = False
 
-# --- PANTALLA DE PORTADA (LOGO ARRIBA Y CLICK TOTAL) ---
+# --- PANTALLA DE PORTADA (LOGO ARRIBA, VIDEO ABAJO) ---
 if not st.session_state.entrado:
     st.markdown("""
     <style>
         .stApp { background-color: black; }
         .portada-full {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: black;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: black; z-index: 1000; overflow: hidden;
         }
         .logo-superior {
-            margin-top: 50px;
-            width: 70%;
-            max-width: 400px;
-            z-index: 1001;
+            width: 80%; max-width: 450px;
+            margin-bottom: 30px; z-index: 1001;
         }
-        .video-fondo {
-            width: 100%;
-            max-height: 60vh;
-            object-fit: contain;
-            margin-top: 20px;
-            z-index: 1000;
+        .video-gif {
+            height: 55vh; width: auto;
+            object-fit: contain; z-index: 1000;
         }
         .stButton > button {
-            position: fixed !important;
-            top: 0 !important; left: 0 !important;
+            position: fixed !important; top: 0 !important; left: 0 !important;
             width: 100vw !important; height: 100vh !important;
-            background: transparent !important;
-            border: none !important;
-            color: transparent !important;
-            z-index: 99999 !important;
+            background: transparent !important; border: none !important;
+            color: transparent !important; z-index: 99999 !important;
+            cursor: pointer !important;
         }
     </style>
     <div class="portada-full">
         <img src="https://i.postimg.cc/Bb71JpGr/image.png" class="logo-superior">
-        <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-fondo">
+        <img src="https://i.postimg.cc/Y2R6XNTN/portada-pappi.gif" class="video-gif">
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("ENTRAR", key="click_total"):
+    if st.button("ENTRAR", key="boton_invisible"):
         st.session_state.entrado = True
-        adjetivo = random.choice(APODOS)
-        st.session_state.nombre_saludo = f"señora {adjetivo}"
+        # Cambio solicitado: Sin el "mi"
+        adj = random.choice(APODOS) if APODOS else "Dinosauria"
+        st.session_state.saludo_nombre = f"señora {adj}"
         st.rerun()
 
-# --- INTERIOR DE LA APP ---
+# --- INTERIOR ---
 else:
     st.markdown("<style>.stApp { background-color: white; }</style>", unsafe_allow_html=True)
     
-    # 1. Saludo: ¡Hola, mi señora [adjetivo]!
-    st.title(f"❤️ ¡Hola, mi {st.session_state.nombre_saludo}!")
+    # 1. Saludo Dinámico Ajustado
+    st.title(f"❤️ ¡Hola, {st.session_state.saludo_nombre}!")
     
-    # 2. Galería de Fotos Dinámica (Muestra una distinta cada vez que entra/actualiza)
-    fotos = [
-        "https://i.postimg.cc/gcRrxRZt/amor-papi-hija.jpg",
-        "https://i.postimg.cc/Bb71JpGr/image.png" # Agregue aquí más links de sus fotos
-    ]
-    st.image(random.choice(fotos), use_container_width=True)
-    
-    st.markdown('<a href="https://wa.me/56992238085" target="_blank" style="background-color:#25D366;color:white;padding:15px;border-radius:10px;text-decoration:none;display:block;text-align:center;font-weight:bold;margin-bottom:20px;">📲 HABLAR CON PAPI REAL</a>', unsafe_allow_html=True)
+    # 2. Multimedia Aleatoria
+    todo_multimedia = [(f, "foto") for f in LISTA_FOTOS] + [(v, "video") for v in LISTA_VIDEOS]
+    if todo_multimedia:
+        item, tipo = random.choice(todo_multimedia)
+        if tipo == "foto":
+            st.image(item, use_container_width=True)
+        else:
+            st.video(item)
+
+    st.markdown('<a href="https://wa.me/56992238085" target="_blank" style="background-color:#25D366;color:white;padding:15px;border-radius:10px;text-decoration:none;display:block;text-align:center;font-weight:bold;margin-bottom:15px;">📲 HABLAR CON PAPI REAL</a>', unsafe_allow_html=True)
     
     if st.button("🤡 ¡Papi, cuéntame un chiste!", use_container_width=True):
-        st.info(random.choice(LISTA_CHISTES))
+        if LISTA_CHISTES:
+            st.info(random.choice(LISTA_CHISTES))
 
     st.divider()
-    
+
     if "chat" not in st.session_state: st.session_state.chat = []
     for m in st.session_state.chat:
         with st.chat_message(m["role"]): st.markdown(m["content"])
 
-    if p := st.chat_input("Dime algo, mi amor..."):
-        st.session_state.chat.append({"role": "user", "content": p})
-        with st.chat_message("user"): st.markdown(p)
+    if prompt := st.chat_input("Dime algo, mi amor..."):
+        st.session_state.chat.append({"role": "user", "content": prompt})
+        with st.chat_message("user"): st.markdown(prompt)
+
         try:
             client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            instrucciones = f"{ADN_SISTEMA}\n\nREGLA: Eres Luis, el papá de Ignacita. Ella es tu 'señora' (apodo). Habla con amor de padre."
             res = client.chat.completions.create(
                 model="gpt-4o-mini",
-                messages=[{"role": "system", "content": ADN_REFORZADO}] + st.session_state.chat
+                messages=[{"role": "system", "content": instrucciones}] + st.session_state.chat
             )
-            r = res.choices[0].message.content
-        except: r = "Pucha mi amor, se cortó la señal, pero pAAPi te adora."
-        with st.chat_message("assistant"): st.markdown(r)
-        st.session_state.chat.append({"role": "assistant", "content": r})
+            respuesta = res.choices[0].message.content
+        except:
+            respuesta = "Pucha mi vida, se me cortó el internet, pero aquí estoy para ti."
+
+        with st.chat_message("assistant"): st.markdown(respuesta)
+        st.session_state.chat.append({"role": "assistant", "content": respuesta})
