@@ -3,10 +3,10 @@ import random
 from openai import OpenAI
 import os
 
-# 1. CONFIGURACIÓN
+# 1. CONFIGURACIÓN INICIAL
 st.set_page_config(page_title="pAAPi", page_icon="🎀", layout="centered")
 
-# 2. FUNCIÓN ESCUDO
+# 2. FUNCIÓN DE LECTURA LIMPIA
 def leer_archivo_limpio(nombre, es_adn=False):
     ruta = os.path.join(os.path.dirname(__file__), nombre)
     try:
@@ -27,10 +27,11 @@ LISTA_CHISTES = leer_archivo_limpio("chistes.txt")
 LISTA_FOTOS = leer_archivo_limpio("fotos.txt")
 LISTA_VIDEOS = leer_archivo_limpio("videos.txt")
 
+# 3. LÓGICA DE NAVEGACIÓN
 if "entrado" not in st.session_state:
     st.session_state.entrado = False
 
-# --- PORTADA PROFESIONAL (LOGO EMERGIENDO) ---
+# --- PANTALLA DE PORTADA ---
 if not st.session_state.entrado:
     st.markdown("""
     <style>
@@ -40,25 +41,15 @@ if not st.session_state.entrado:
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             background: black; z-index: 1000; overflow: hidden;
         }
-        /* EL LOGO QUE EMERGE SUAVEMENTE */
         .logo-pappi {
-            position: absolute;
-            top: 15%; 
-            width: 75%; max-width: 480px;
-            z-index: 1002;
-            animation: aparecer 2.5s ease-out;
+            position: absolute; top: 15%; width: 75%; max-width: 480px;
+            z-index: 1002; animation: aparecer 2.5s ease-out;
         }
         @keyframes aparecer {
             from { opacity: 0; transform: scale(0.9); }
             to { opacity: 1; transform: scale(1); }
         }
-        /* EL GIF DE FONDO */
-        .video-gif {
-            width: 100%; height: 100%;
-            object-fit: cover; /* Para que llene la pantalla como en su captura */
-            z-index: 1001;
-        }
-        /* CAPA INVISIBLE PARA CLICK TOTAL */
+        .video-gif { width: 100%; height: 100%; object-fit: cover; z-index: 1001; }
         .stButton > button {
             position: fixed !important; top: 0 !important; left: 0 !important;
             width: 100vw !important; height: 100vh !important;
@@ -78,12 +69,11 @@ if not st.session_state.entrado:
         st.session_state.saludo_nombre = f"señora {adj}"
         st.rerun()
 
-# --- INTERIOR DE LA APP ---
+# --- INTERIOR ---
 else:
     st.markdown("<style>.stApp { background-color: white; }</style>", unsafe_allow_html=True)
     st.title(f"❤️ ¡Hola, {st.session_state.saludo_nombre}!")
     
-    # Multimedia Aleatoria
     todo_m = [(f, "foto") for f in LISTA_FOTOS] + [(v, "video") for v in LISTA_VIDEOS]
     if todo_m:
         item, tipo = random.choice(todo_m)
@@ -97,11 +87,29 @@ else:
 
     st.divider()
     if "chat" not in st.session_state: st.session_state.chat = []
+    
+    # Muestra el chat
     for m in st.session_state.chat:
         with st.chat_message(m["role"]): st.markdown(m["content"])
 
-    # SALUDO PERSONALIZADO EN EL CUADRO
+    # CUADRO DE DIÁLOGO
     if p := st.chat_input("Cuénteme algo mi niñita"):
+        
+        # --- MODO SUPERVISOR SLYDINI ---
+        if p.lower().strip() == "slydini":
+            st.warning("🕵️ MODO SUPERVISOR ACTIVADO")
+            historial = ""
+            for m in st.session_state.chat:
+                rol = "Ignacita" if m["role"] == "user" else "pAAPi"
+                historial += f"{rol}: {m['content']}\n\n"
+            
+            if historial:
+                st.text_area("Historial de la sesión:", value=historial, height=400)
+            else:
+                st.info("Aún no hay mensajes en esta sesión.")
+            st.stop()
+        # -------------------------------
+
         st.session_state.chat.append({"role": "user", "content": p})
         with st.chat_message("user"): st.markdown(p)
         try:
