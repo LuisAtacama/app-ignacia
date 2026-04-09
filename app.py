@@ -80,43 +80,13 @@ else:
         if tipo == "foto": st.image(item, use_container_width=True)
         else: st.video(item)
 
+    # BOTÓN WHATSAPP
     st.markdown('<a href="https://wa.me/56992238085" target="_blank" style="background-color:#25D366;color:white;padding:15px;border-radius:10px;text-decoration:none;display:block;text-align:center;font-weight:bold;margin-bottom:15px;">📲 HABLAR CON PAPI REAL</a>', unsafe_allow_html=True)
     
+    # BOTÓN DE CHISTES
     if st.button("🤡 ¡Papi, cuéntame un chiste!", use_container_width=True):
         if LISTA_CHISTES: st.info(random.choice(LISTA_CHISTES))
 
+    # El código del chat ha sido removido completamente de la visualización
+    # para que no quede rastro del cuadro de diálogo.
     st.divider()
-    if "chat" not in st.session_state: st.session_state.chat = []
-    
-    # Muestra el chat
-    for m in st.session_state.chat:
-        with st.chat_message(m["role"]): st.markdown(m["content"])
-
-    # CUADRO DE DIÁLOGO
-    if p := st.chat_input("Cuénteme algo mi niñita"):
-        
-        # --- MODO SUPERVISOR SLYDINI ---
-        if p.lower().strip() == "slydini":
-            st.warning("🕵️ MODO SUPERVISOR ACTIVADO")
-            historial = ""
-            for m in st.session_state.chat:
-                rol = "Ignacita" if m["role"] == "user" else "pAAPi"
-                historial += f"{rol}: {m['content']}\n\n"
-            
-            if historial:
-                st.text_area("Historial de la sesión:", value=historial, height=400)
-            else:
-                st.info("Aún no hay mensajes en esta sesión.")
-            st.stop()
-        # -------------------------------
-
-        st.session_state.chat.append({"role": "user", "content": p})
-        with st.chat_message("user"): st.markdown(p)
-        try:
-            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-            instr = f"{ADN_SISTEMA}\nREGLA: Eres el papá Luis hablando con su hija Ignacita."
-            res = client.chat.completions.create(model="gpt-4o-mini", messages=[{"role": "system", "content": instr}] + st.session_state.chat)
-            r = res.choices[0].message.content
-        except: r = "Se cortó la señal, mi niña, pero aquí estoy."
-        with st.chat_message("assistant"): st.markdown(r)
-        st.session_state.chat.append({"role": "assistant", "content": r})
